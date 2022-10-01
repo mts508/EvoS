@@ -42,13 +42,14 @@ namespace EvoS.DirectoryServer
         public void Configure(IApplicationBuilder app)
         {
             var serverAddressesFeature = app.ServerFeatures.Get<IServerAddressesFeature>();
-            Log.Print(LogType.Server, "Started DirectoryServer on '0.0.0.0:6050'");
+            Log.Print(LogType.Server, $"Started DirectoryServer on '0.0.0.0:{EvosConfiguration.GetDirectoryServerPort()}'");
 
             app.Run((context) =>
             {
                 context.Response.ContentType = "application/json";
                 MemoryStream ms = new MemoryStream();
                 context.Request.Body.CopyTo(ms);
+                Log.Print(LogType.Debug, context.Request.Host.Host);
                 ms.Position = 0;
                 string requestBody = new StreamReader(ms).ReadToEnd(); ;
                 ms.Dispose();
@@ -96,7 +97,7 @@ namespace EvoS.DirectoryServer
                 response.SessionInfo.FakeEntitlements = "";
                 response.SessionInfo.LanguageCode = "EN"; // Needs to be uppercase
 
-                response.LobbyServerAddress = "127.0.0.1";
+                response.LobbyServerAddress = "finnegans-ThinkPad-L15-Gen-2";
 
                 LobbyGameClientProxyInfo proxyInfo = new LobbyGameClientProxyInfo();
                 proxyInfo.AccountId = response.SessionInfo.AccountId;

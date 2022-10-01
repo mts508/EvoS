@@ -17,10 +17,18 @@ namespace EvoS.Framework
         {
             if (Instance == null)
             {
-                var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
+                try
+                {
+                    var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
                     .Build();
+                    Instance = deserializer.Deserialize<EvosConfiguration>(File.ReadAllText("settings.yaml"));
+                }
+                catch (FileNotFoundException e)
+                {
+                    // Create with default configuration
+                    Instance = new EvosConfiguration();
+                }
 
-                Instance = deserializer.Deserialize<EvosConfiguration>(File.ReadAllText("settings.yaml"));
             }
 
             return Instance;

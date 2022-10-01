@@ -119,7 +119,7 @@ namespace CentralServer.LobbyServer.Gamemode
         private static GameSubType LoadGameSubType(string filename)
         {
             // TODO: this always read from file, it could be stored in a cache
-            JsonReader reader = new JsonTextReader(new StreamReader(@"Config\GameSubTypes\" + filename));
+            JsonReader reader = new JsonTextReader(new StreamReader(@"Config/GameSubTypes/" + filename));
             try
             {
                 return new JsonSerializer().Deserialize<GameSubType>(reader);
