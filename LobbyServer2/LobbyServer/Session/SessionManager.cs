@@ -13,13 +13,14 @@ namespace CentralServer.LobbyServer.Session
 {
     public static class SessionManager
     {
-        private static ConcurrentDictionary<long, LobbyPlayerInfo> ActivePlayers = new ConcurrentDictionary<long, LobbyPlayerInfo>();// key: AccountID
+        private static ConcurrentDictionary<long, LobbyServerPlayerInfo> ActivePlayers = new ConcurrentDictionary<long, LobbyServerPlayerInfo>();// key: AccountID
         private static ConcurrentDictionary<long, long> SessionTokenAccountIDCache = new ConcurrentDictionary<long, long>(); // key: SessionToken, value: AccountID
         private static ConcurrentDictionary<long, LobbyServerProtocol> ActiveConnections = new ConcurrentDictionary<long, LobbyServerProtocol>();
+        private static ConcurrentDictionary<long, LobbySessionInfo> ActiveSessions = new ConcurrentDictionary<long, LobbySessionInfo>();
         private static long GeneratedSessionToken = 0;
 
 
-        public static LobbyPlayerInfo OnPlayerConnect(LobbyServerProtocol client, RegisterGameClientRequest clientRequest)
+        public static LobbyServerPlayerInfo OnPlayerConnect(LobbyServerProtocol client, RegisterGameClientRequest clientRequest)
         {
             long sessionToken = Interlocked.Increment(ref GeneratedSessionToken);
             Database.Account user = Database.Account.GetByUserName(clientRequest.AuthInfo.Handle);
@@ -30,13 +31,14 @@ namespace CentralServer.LobbyServer.Session
             client.UserName = user.UserName;
             client.SelectedGameType = user.LastSelectedGameType;
             client.SelectedSubTypeMask = 0;
+            clientRequest.SessionInfo.SessionToken = sessionToken;
 
-            LobbyPlayerInfo playerInfo = new LobbyPlayerInfo
+            LobbyServerPlayerInfo playerInfo = new LobbyServerPlayerInfo
             {
                 AccountId = user.AccountId,
                 BannerID = user.BannerID,
                 BotCanTaunt = false,
-                BotsMasqueradeAsHumans = false,
+                // BotsMasqueradeAsHumans = false,
                 CharacterInfo = CharacterManager.GetCharacterInfo(user.AccountId, user.LastCharacter),
                 ControllingPlayerId = 0,
                 EffectiveClientAccessLevel = ClientAccessLevel.Full,
@@ -56,6 +58,7 @@ namespace CentralServer.LobbyServer.Session
             ActivePlayers.TryAdd(user.AccountId, playerInfo);
             SessionTokenAccountIDCache.TryAdd(sessionToken, playerInfo.AccountId);
             ActiveConnections.TryAdd(user.AccountId, client);
+            ActiveSessions.TryAdd(user.AccountId, clientRequest.SessionInfo);
 
             return playerInfo;
         }
@@ -65,11 +68,12 @@ namespace CentralServer.LobbyServer.Session
             ActivePlayers.TryRemove(client.AccountId, out _);
             SessionTokenAccountIDCache.TryRemove(client.SessionToken, out _);
             ActiveConnections.TryRemove(client.AccountId, out _);
+            ActiveSessions.TryRemove(client.AccountId, out _);
         }
 
-        public static LobbyPlayerInfo GetPlayerInfo(long accountId)
+        public static LobbyServerPlayerInfo GetPlayerInfo(long accountId)
         {
-            LobbyPlayerInfo playerInfo = null;
+            LobbyServerPlayerInfo playerInfo = null;
             ActivePlayers.TryGetValue(accountId, out playerInfo);
 
             return playerInfo;
@@ -90,6 +94,13 @@ namespace CentralServer.LobbyServer.Session
             LobbyServerProtocol clientConnection = null;
             ActiveConnections.TryGetValue(accountId, out clientConnection);
             return clientConnection;
+        }
+
+        public static LobbySessionInfo GetSessionInfo(long accountId)
+        {
+            LobbySessionInfo sessionInfo = null;
+            ActiveSessions.TryGetValue(accountId, out sessionInfo);
+            return sessionInfo;
         }
     }
 }

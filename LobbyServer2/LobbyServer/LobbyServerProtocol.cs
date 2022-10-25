@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CentralServer.BridgeServer;
 using WebSocketSharp;
 
 namespace CentralServer.LobbyServer
@@ -45,12 +46,11 @@ namespace CentralServer.LobbyServer
             RegisterHandler(new EvosMessageDelegate<PurchaseChatEmojiRequest>(HandlePurchaseChatEmoji));
             RegisterHandler(new EvosMessageDelegate<PurchaseLoadoutSlotRequest>(HandlePurchaseLoadoutSlot));
             */
-
         }
 
         protected override void OnClose(CloseEventArgs e)
         {
-            LobbyPlayerInfo playerInfo = SessionManager.GetPlayerInfo(this.AccountId);
+            LobbyServerPlayerInfo playerInfo = SessionManager.GetPlayerInfo(this.AccountId);
             if (playerInfo != null)
             {
                 Log.Print(LogType.Lobby, string.Format(Config.Messages.PlayerDisconnected, this.UserName));
@@ -62,7 +62,7 @@ namespace CentralServer.LobbyServer
         {
             try
             {
-                LobbyPlayerInfo playerInfo = SessionManager.OnPlayerConnect(this, request);
+                LobbyServerPlayerInfo playerInfo = SessionManager.OnPlayerConnect(this, request);
 
                 if (playerInfo != null)
                 {
@@ -70,7 +70,7 @@ namespace CentralServer.LobbyServer
                     RegisterGameClientResponse response = new RegisterGameClientResponse
                     {
                         AuthInfo = request.AuthInfo,
-                        SessionInfo = request.SessionInfo,
+                        SessionInfo = SessionManager.GetSessionInfo(request.AuthInfo.AccountId),
                         ResponseId = request.RequestId
                     };
 
@@ -89,8 +89,14 @@ namespace CentralServer.LobbyServer
             }
         }
 
-        public void HandleOptionsNotification(OptionsNotification notification) {}
-        public void HandleCustomKeyBindNotification(CustomKeyBindNotification notification) { }
+        public void HandleOptionsNotification(OptionsNotification notification)
+        {
+        }
+
+        public void HandleCustomKeyBindNotification(CustomKeyBindNotification notification)
+        {
+        }
+
         public void HandlePricesRequest(PricesRequest request)
         {
             PricesResponse response = StoreManager.GetPricesResponse();
@@ -127,7 +133,7 @@ namespace CentralServer.LobbyServer
         public void HandlePlayerInfoUpdateRequest(PlayerInfoUpdateRequest request)
         {
             LobbyPlayerInfoUpdate playerInfoUpdate = request.PlayerInfoUpdate;
-            
+
 
             if (request.GameType != null && request.GameType.HasValue)
                 SetGameType(request.GameType.Value);
@@ -135,7 +141,7 @@ namespace CentralServer.LobbyServer
             if (playerInfoUpdate.CharacterType != null && playerInfoUpdate.CharacterType.HasValue)
             {
                 SetCharacterType(playerInfoUpdate.CharacterType.Value);
-                LobbyPlayerInfo playerInfo = SessionManager.GetPlayerInfo(this.AccountId);
+                LobbyServerPlayerInfo playerInfo = SessionManager.GetPlayerInfo(this.AccountId);
 
                 PersistedAccountData accountData = AccountManager.GetPersistedAccountData(this.AccountId);
                 // should be automatic when account gets its data from database, but for now we modify the needed things here
@@ -145,7 +151,7 @@ namespace CentralServer.LobbyServer
                 accountData.AccountComponent.SelectedRibbonID = playerInfo.RibbonID;
                 accountData.AccountComponent.SelectedTitleID = playerInfo.TitleID;
                 // end "should be automatic"
-                
+
                 PlayerAccountDataUpdateNotification updateNotification = new PlayerAccountDataUpdateNotification()
                 {
                     AccountData = accountData
@@ -154,7 +160,7 @@ namespace CentralServer.LobbyServer
 
                 PlayerInfoUpdateResponse response = new PlayerInfoUpdateResponse()
                 {
-                    PlayerInfo = playerInfo,
+                    PlayerInfo = LobbyPlayerInfo.FromServer(playerInfo, 0, new MatchmakingQueueConfig()),
                     CharacterInfo = playerInfo.CharacterInfo,
                     OriginalPlayerInfoUpdate = request.PlayerInfoUpdate,
                     ResponseId = request.RequestId
@@ -172,9 +178,9 @@ namespace CentralServer.LobbyServer
                 SetCharacterLoadoutChanges(playerInfoUpdate.CharacterLoadoutChanges.Value);
             if (playerInfoUpdate.CharacterMods != null && playerInfoUpdate.CharacterMods.HasValue)
                 SetCharacterMods(playerInfoUpdate.CharacterMods.Value);
-            if (playerInfoUpdate.CharacterSkin!= null && playerInfoUpdate.CharacterSkin.HasValue)
+            if (playerInfoUpdate.CharacterSkin != null && playerInfoUpdate.CharacterSkin.HasValue)
                 SetCharacterSkin(playerInfoUpdate.CharacterSkin.Value);
-            
+
             if (playerInfoUpdate.ContextualReadyState != null && playerInfoUpdate.ContextualReadyState.HasValue)
                 SetContextualReadyState(playerInfoUpdate.ContextualReadyState.Value);
             if (playerInfoUpdate.EnemyDifficulty != null && playerInfoUpdate.EnemyDifficulty.HasValue)
@@ -213,7 +219,7 @@ namespace CentralServer.LobbyServer
         {
             PreviousGameInfoResponse response = new PreviousGameInfoResponse()
             {
-                PreviousGameInfo =  null,
+                PreviousGameInfo = null,
                 ResponseId = request.RequestId
             };
             Send(response);
@@ -250,8 +256,19 @@ namespace CentralServer.LobbyServer
                 ResponseId = request.RequestId
             };
             Send(response);
-        }
 
+            if (CurrentServer != null)
+            {
+                CurrentServer.clients.Remove(this);
+                GameStatusNotification notify = new GameStatusNotification()
+                {
+                    GameServerProcessCode = CurrentServer.ProcessCode,
+                    GameStatus = GameStatus.Stopped // TODO check if there is a better way to make client leave mid-game
+                };
+                Send(notify);
+                CurrentServer = null; // we will probably want to save it somewhere for reconnection
+            }
+        }
 
 
         public void HandleJoinMatchmakingQueueRequest(JoinMatchmakingQueueRequest request)
@@ -270,7 +287,5 @@ namespace CentralServer.LobbyServer
             Log.Print(LogType.Error, "Code not implented yet for LeaveMatchmakingQueueRequest, must remove from queue");
             Send(new LeaveMatchmakingQueueResponse() { ResponseId = request.RequestId });
         }
-
-
     }
 }

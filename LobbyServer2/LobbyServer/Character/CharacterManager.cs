@@ -155,14 +155,14 @@ namespace CentralServer.LobbyServer.Character
             return skins;
         }
 
-        public static LobbyPlayerInfo GetPunchingDummyPlayerInfo()
+        public static LobbyServerPlayerInfo GetPunchingDummyPlayerInfo()
         {
-            return new LobbyPlayerInfo
+            return new LobbyServerPlayerInfo
             {
                 AccountId = 0,
                 BannerID = -1,
                 BotCanTaunt = true,
-                BotsMasqueradeAsHumans = false,
+                // BotsMasqueradeAsHumans = false,
                 CharacterInfo = new LobbyCharacterInfo
                 {
                     CharacterType = CharacterType.PunchingDummy,

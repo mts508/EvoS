@@ -97,7 +97,7 @@ namespace EvoS.DirectoryServer
                 response.SessionInfo.FakeEntitlements = "";
                 response.SessionInfo.LanguageCode = "EN"; // Needs to be uppercase
 
-                response.LobbyServerAddress = "finnegans-ThinkPad-L15-Gen-2";
+                response.LobbyServerAddress = EvosConfiguration.GetLobbyServerAddress();
 
                 LobbyGameClientProxyInfo proxyInfo = new LobbyGameClientProxyInfo();
                 proxyInfo.AccountId = response.SessionInfo.AccountId;
