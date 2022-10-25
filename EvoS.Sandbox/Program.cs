@@ -11,7 +11,6 @@ namespace EvoS.Sandbox
         public static int Main(string[] args)
         {
             CommandLineApplication.Execute<Program>(args);
-            Console.ReadLine();
             return 0;
         }
         

@@ -24,9 +24,9 @@ namespace CentralServer
                 Log.Print(LogType.Warning, "GameServerExecutable not set in settings.yaml");
                 Log.Print(LogType.Warning, "Automatic game server launch is disabled. Game servers can still connect to this lobby");
             }
-            Console.ReadLine();
             
-            //Console.ReadKey();
+            
+            
             //server.Stop();
         }
     }
