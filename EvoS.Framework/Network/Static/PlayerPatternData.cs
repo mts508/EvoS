@@ -19,7 +19,7 @@ namespace EvoS.Framework.Network.Static
         {
             while (Colors.Count <= i)
             {
-                Colors.Add(new PlayerColorData());
+                Colors.Add(new PlayerColorData() { Unlocked = true }); ;
             }
 
             return Colors[i];

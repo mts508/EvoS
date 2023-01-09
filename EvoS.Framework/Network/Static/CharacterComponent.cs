@@ -25,7 +25,7 @@ namespace EvoS.Framework.Network.Static
             this.LastSelectedRankedLoadout = -1;
         }
 
-        public void UnlockSkinsAndTaunts()
+        public void UnlockSkinsAndTaunts(CharacterType character)
         {
             Unlocked = true;
             Taunts = new List<PlayerTauntData>();
@@ -33,30 +33,216 @@ namespace EvoS.Framework.Network.Static
             {
                 Taunts.Add(new PlayerTauntData() { Unlocked = true });
             }
-            Skins = new List<PlayerSkinData>();
-            for (int i = 0; i < 5; i++)
-            {
-                PlayerSkinData playerSkinData = new PlayerSkinData
-                {
-                    Unlocked = true,
-                    Patterns = new List<PlayerPatternData>()
-                };
-                for (int j = 0; j < 4; j++)
-                {
-                    PlayerPatternData playerPatternData = new PlayerPatternData()
-                    {
-                        Unlocked = true,
-                        Colors = new List<PlayerColorData>()
-                    };
-                    for (int k = 0; k < 17; k++)
-                    {
-                        playerPatternData.Colors.Add(new PlayerColorData() { Unlocked = true });
-                    }
-                    playerSkinData.Patterns.Add(playerPatternData);
-                }
 
-                Skins.Add(playerSkinData);
+            UnlockSkins(character);
+        }
+
+        public void UnlockSkins(CharacterType characterType)
+        {
+            switch (characterType)
+            {
+                case CharacterType.BattleMonk:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 1, 0); UnlockSkinPatternColor(0, 1, 1); UnlockSkinPatternColor(0, 1, 2); UnlockSkinPatternColor(0, 1, 3); UnlockSkinPatternColor(0, 1, 4);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 1, 0); UnlockSkinPatternColor(1, 1, 1); UnlockSkinPatternColor(1, 1, 2); UnlockSkinPatternColor(1, 1, 3); UnlockSkinPatternColor(1, 1, 4); UnlockSkinPatternColor(1, 1, 5);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7); UnlockSkinPatternColor(2, 0, 8);
+                    UnlockSkinPatternColor(3, 0, 0);
+                    break;
+                case CharacterType.BazookaGirl:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14); UnlockSkinPatternColor(0, 1, 0); UnlockSkinPatternColor(0, 2, 0); UnlockSkinPatternColor(0, 3, 0);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7); UnlockSkinPatternColor(1, 0, 8);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7); UnlockSkinPatternColor(2, 0, 8); UnlockSkinPatternColor(2, 0, 9);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6); UnlockSkinPatternColor(3, 0, 7);
+                    break;
+                case CharacterType.DigitalSorceress:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7); UnlockSkinPatternColor(1, 0, 8);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6); UnlockSkinPatternColor(3, 0, 7); UnlockSkinPatternColor(3, 0, 8);
+                    break;
+                case CharacterType.Gremlins:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 1, 0); UnlockSkinPatternColor(0, 1, 1); UnlockSkinPatternColor(0, 1, 2); UnlockSkinPatternColor(0, 1, 3); UnlockSkinPatternColor(0, 1, 4);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 1, 0); UnlockSkinPatternColor(1, 1, 1); UnlockSkinPatternColor(1, 1, 2); UnlockSkinPatternColor(1, 1, 3); UnlockSkinPatternColor(1, 1, 4);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7); UnlockSkinPatternColor(2, 0, 8);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6); UnlockSkinPatternColor(3, 0, 7); UnlockSkinPatternColor(3, 0, 8);
+                    break;
+                case CharacterType.NanoSmith:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7); UnlockSkinPatternColor(1, 0, 8);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6); UnlockSkinPatternColor(3, 0, 7); UnlockSkinPatternColor(3, 0, 8);
+                    break;
+                case CharacterType.RageBeast:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14); UnlockSkinPatternColor(0, 0, 15); UnlockSkinPatternColor(0, 1, 0); UnlockSkinPatternColor(0, 1, 1); UnlockSkinPatternColor(0, 1, 2); UnlockSkinPatternColor(0, 1, 3);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7); UnlockSkinPatternColor(1, 0, 8); UnlockSkinPatternColor(1, 0, 9);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7); UnlockSkinPatternColor(2, 0, 8);
+                    break;
+                case CharacterType.RobotAnimal:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14); UnlockSkinPatternColor(0, 1, 0); UnlockSkinPatternColor(0, 1, 1); UnlockSkinPatternColor(0, 1, 2); UnlockSkinPatternColor(0, 1, 3); UnlockSkinPatternColor(0, 1, 4); UnlockSkinPatternColor(0, 1, 5);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 1, 0); UnlockSkinPatternColor(1, 1, 1); UnlockSkinPatternColor(1, 1, 2); UnlockSkinPatternColor(1, 1, 3); UnlockSkinPatternColor(1, 1, 4); UnlockSkinPatternColor(1, 1, 5); UnlockSkinPatternColor(1, 1, 6);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6); UnlockSkinPatternColor(3, 0, 7); UnlockSkinPatternColor(3, 0, 8);
+                    break;
+                case CharacterType.Scoundrel:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14); UnlockSkinPatternColor(0, 0, 15); UnlockSkinPatternColor(0, 0, 16); UnlockSkinPatternColor(0, 1, 0); UnlockSkinPatternColor(0, 1, 1); UnlockSkinPatternColor(0, 1, 2); UnlockSkinPatternColor(0, 1, 3); UnlockSkinPatternColor(0, 1, 4); UnlockSkinPatternColor(0, 1, 5);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 1, 0); UnlockSkinPatternColor(1, 1, 1); UnlockSkinPatternColor(1, 1, 2); UnlockSkinPatternColor(1, 1, 3);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7); UnlockSkinPatternColor(2, 0, 8);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4);
+                    break;
+                case CharacterType.Sniper:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 1, 0); UnlockSkinPatternColor(0, 1, 1); UnlockSkinPatternColor(0, 1, 2); UnlockSkinPatternColor(0, 1, 3); UnlockSkinPatternColor(0, 1, 4); UnlockSkinPatternColor(0, 1, 5);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 1, 0); UnlockSkinPatternColor(1, 1, 1); UnlockSkinPatternColor(1, 1, 2); UnlockSkinPatternColor(1, 1, 3); UnlockSkinPatternColor(1, 1, 4); UnlockSkinPatternColor(1, 1, 5);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6); UnlockSkinPatternColor(3, 0, 7);
+                    UnlockSkinPatternColor(4, 0, 0); UnlockSkinPatternColor(4, 0, 1); UnlockSkinPatternColor(4, 0, 2); UnlockSkinPatternColor(4, 0, 3); UnlockSkinPatternColor(4, 0, 4); UnlockSkinPatternColor(4, 0, 5); UnlockSkinPatternColor(4, 0, 6); UnlockSkinPatternColor(4, 0, 7); UnlockSkinPatternColor(4, 0, 8); UnlockSkinPatternColor(4, 0, 9);
+                    break;
+                case CharacterType.SpaceMarine:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 1, 0); UnlockSkinPatternColor(0, 1, 1); UnlockSkinPatternColor(0, 1, 2); UnlockSkinPatternColor(0, 1, 3); UnlockSkinPatternColor(0, 1, 4); UnlockSkinPatternColor(0, 1, 5); UnlockSkinPatternColor(0, 1, 6); UnlockSkinPatternColor(0, 1, 7);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 1, 0); UnlockSkinPatternColor(1, 1, 1); UnlockSkinPatternColor(1, 1, 2); UnlockSkinPatternColor(1, 1, 3); UnlockSkinPatternColor(1, 1, 4); UnlockSkinPatternColor(1, 1, 5);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7); UnlockSkinPatternColor(2, 0, 8);
+                    break;
+                case CharacterType.Spark:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 1, 0); UnlockSkinPatternColor(0, 1, 1); UnlockSkinPatternColor(0, 1, 2); UnlockSkinPatternColor(0, 1, 3); UnlockSkinPatternColor(0, 1, 4); UnlockSkinPatternColor(0, 1, 5); UnlockSkinPatternColor(0, 2, 0);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 1, 0); UnlockSkinPatternColor(1, 1, 1); UnlockSkinPatternColor(1, 1, 2); UnlockSkinPatternColor(1, 1, 3); UnlockSkinPatternColor(1, 1, 4); UnlockSkinPatternColor(1, 1, 5);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7); UnlockSkinPatternColor(2, 0, 8);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6); UnlockSkinPatternColor(3, 0, 7);
+                    UnlockSkinPatternColor(4, 0, 0); UnlockSkinPatternColor(4, 0, 1); UnlockSkinPatternColor(4, 0, 2); UnlockSkinPatternColor(4, 0, 3); UnlockSkinPatternColor(4, 0, 4); UnlockSkinPatternColor(4, 0, 5); UnlockSkinPatternColor(4, 0, 6);
+                    break;
+                case CharacterType.TeleportingNinja:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6);
+                    break;
+                case CharacterType.Thief:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14); UnlockSkinPatternColor(0, 0, 15);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6);
+                    UnlockSkinPatternColor(4, 0, 0); UnlockSkinPatternColor(4, 0, 1); UnlockSkinPatternColor(4, 0, 2); UnlockSkinPatternColor(4, 0, 3); UnlockSkinPatternColor(4, 0, 4); UnlockSkinPatternColor(4, 0, 5); UnlockSkinPatternColor(4, 0, 6); UnlockSkinPatternColor(4, 0, 7); UnlockSkinPatternColor(4, 0, 8);
+                    break;
+                case CharacterType.Tracker:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 1, 0); UnlockSkinPatternColor(0, 1, 1); UnlockSkinPatternColor(0, 1, 2); UnlockSkinPatternColor(0, 1, 3); UnlockSkinPatternColor(0, 1, 4); UnlockSkinPatternColor(0, 1, 5);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 1, 0); UnlockSkinPatternColor(1, 1, 1); UnlockSkinPatternColor(1, 1, 2); UnlockSkinPatternColor(1, 1, 3); UnlockSkinPatternColor(1, 1, 4); UnlockSkinPatternColor(1, 1, 5);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6);
+                    break;
+                case CharacterType.Trickster:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7); UnlockSkinPatternColor(2, 0, 8); UnlockSkinPatternColor(2, 0, 9);
+                    break;
+                case CharacterType.Rampart:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6); UnlockSkinPatternColor(3, 0, 7); UnlockSkinPatternColor(3, 0, 8); UnlockSkinPatternColor(3, 0, 9);
+                    break;
+                case CharacterType.Claymore:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14); UnlockSkinPatternColor(0, 0, 15); UnlockSkinPatternColor(0, 0, 16);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6); UnlockSkinPatternColor(3, 0, 7); UnlockSkinPatternColor(3, 0, 8); UnlockSkinPatternColor(3, 0, 9);
+                    UnlockSkinPatternColor(4, 0, 0); UnlockSkinPatternColor(4, 0, 1); UnlockSkinPatternColor(4, 0, 2); UnlockSkinPatternColor(4, 0, 3); UnlockSkinPatternColor(4, 0, 4); UnlockSkinPatternColor(4, 0, 5); UnlockSkinPatternColor(4, 0, 6);
+                    break;
+                case CharacterType.Blaster:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7); UnlockSkinPatternColor(1, 0, 8); UnlockSkinPatternColor(1, 0, 9); UnlockSkinPatternColor(1, 0, 10);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6);
+                    break;
+                case CharacterType.FishMan:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14); UnlockSkinPatternColor(0, 0, 15);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7); UnlockSkinPatternColor(2, 0, 8);
+                    break;
+                case CharacterType.Exo:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7); UnlockSkinPatternColor(2, 0, 8); UnlockSkinPatternColor(2, 0, 9); UnlockSkinPatternColor(2, 0, 10); UnlockSkinPatternColor(2, 0, 11);
+                    break;
+                case CharacterType.Soldier:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7); UnlockSkinPatternColor(1, 0, 8);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6);
+                    break;
+                case CharacterType.Martyr:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7); UnlockSkinPatternColor(1, 0, 8);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7); UnlockSkinPatternColor(2, 0, 8);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6);
+                    break;
+                case CharacterType.Sensei:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7); UnlockSkinPatternColor(1, 0, 8); UnlockSkinPatternColor(1, 0, 9);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5); UnlockSkinPatternColor(2, 0, 6); UnlockSkinPatternColor(2, 0, 7); UnlockSkinPatternColor(2, 0, 8);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5); UnlockSkinPatternColor(3, 0, 6);
+                    break;
+                case CharacterType.PendingWillFill:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2);
+                    break;
+                case CharacterType.Manta:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5);
+                    UnlockSkinPatternColor(3, 0, 0); UnlockSkinPatternColor(3, 0, 1); UnlockSkinPatternColor(3, 0, 2); UnlockSkinPatternColor(3, 0, 3); UnlockSkinPatternColor(3, 0, 4); UnlockSkinPatternColor(3, 0, 5);
+                    break;
+                case CharacterType.Valkyrie:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7); UnlockSkinPatternColor(1, 0, 8);
+                    break;
+                case CharacterType.Archer:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6);
+                    break;
+                case CharacterType.Samurai:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13); UnlockSkinPatternColor(0, 0, 14); UnlockSkinPatternColor(0, 0, 15);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7); UnlockSkinPatternColor(1, 0, 8);
+                    break;
+                case CharacterType.Gryd:
+                    UnlockSkinPatternColor(0, 0, 0);
+                    break;
+                case CharacterType.Cleric:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6);
+                    UnlockSkinPatternColor(2, 0, 0); UnlockSkinPatternColor(2, 0, 1); UnlockSkinPatternColor(2, 0, 2); UnlockSkinPatternColor(2, 0, 3); UnlockSkinPatternColor(2, 0, 4); UnlockSkinPatternColor(2, 0, 5);
+                    break;
+                case CharacterType.Neko:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6);
+                    break;
+                case CharacterType.Scamp:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5);
+                    break;
+                case CharacterType.Dino:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8); UnlockSkinPatternColor(0, 0, 9); UnlockSkinPatternColor(0, 0, 10); UnlockSkinPatternColor(0, 0, 11); UnlockSkinPatternColor(0, 0, 12); UnlockSkinPatternColor(0, 0, 13);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6); UnlockSkinPatternColor(1, 0, 7); UnlockSkinPatternColor(1, 0, 8);
+                    break;
+                case CharacterType.Iceborg:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6);
+                    break;
+                case CharacterType.Fireborg:
+                    UnlockSkinPatternColor(0, 0, 0); UnlockSkinPatternColor(0, 0, 1); UnlockSkinPatternColor(0, 0, 2); UnlockSkinPatternColor(0, 0, 3); UnlockSkinPatternColor(0, 0, 4); UnlockSkinPatternColor(0, 0, 5); UnlockSkinPatternColor(0, 0, 6); UnlockSkinPatternColor(0, 0, 7); UnlockSkinPatternColor(0, 0, 8);
+                    UnlockSkinPatternColor(1, 0, 0); UnlockSkinPatternColor(1, 0, 1); UnlockSkinPatternColor(1, 0, 2); UnlockSkinPatternColor(1, 0, 3); UnlockSkinPatternColor(1, 0, 4); UnlockSkinPatternColor(1, 0, 5); UnlockSkinPatternColor(1, 0, 6);
+                    break;
             }
+        }
+
+        private void UnlockSkinPatternColor(int skinID, int patternID, int colorID)
+        {
+            GetSkin(skinID).GetPattern(patternID).GetColor(colorID);
+        }
+
+        private PlayerSkinData GetSkin(int index)
+        {
+            while (Skins.Count <= index)
+            {
+                Skins.Add(new PlayerSkinData() { Unlocked = true });
+            }
+            
+            return Skins[index];
         }
 
         public bool Unlocked { get; set; }

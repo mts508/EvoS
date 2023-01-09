@@ -14,6 +14,17 @@ namespace EvoS.Framework.Network.Static
 
         public bool Unlocked { get; set; }
 
+        public PlayerPatternData GetPattern(int patternID)
+        {
+            while (Patterns.Count <= patternID)
+            {
+                Patterns.Add(new PlayerPatternData() { Unlocked = true });
+            }
+
+            return Patterns[patternID];
+        }
+
         [EvosMessage(534)] public List<PlayerPatternData> Patterns { get; set; }
+
     }
 }

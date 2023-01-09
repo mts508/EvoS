@@ -166,7 +166,8 @@ namespace EvoS.DirectoryServer
         {
             foreach (PersistedCharacterData persistedCharacterData in account.CharacterData.Values)
             {
-                persistedCharacterData.CharacterComponent.UnlockSkinsAndTaunts();
+                persistedCharacterData.CharacterComponent.UnlockSkinsAndTaunts(persistedCharacterData.CharacterType);
+                persistedCharacterData.ExperienceComponent.Level = 20;
             }
 
             account.AccountComponent.UnlockedEmojiIDs = InventoryManager.GetUnlockedEmojiIDs(account.AccountId);
