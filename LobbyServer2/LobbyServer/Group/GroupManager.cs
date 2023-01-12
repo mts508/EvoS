@@ -209,7 +209,7 @@ namespace CentralServer.LobbyServer.Group
                 }
             }
 
-            return 0;
+            return -1;
         }
 
         private static void OnJoinGroup(long accountId)
