@@ -202,9 +202,11 @@ namespace CentralServer.LobbyServer
                         SessionInfo = SessionManager.GetSessionInfo(request.AuthInfo.AccountId),
                         ResponseId = request.RequestId
                     };
-                    GroupManager.CreateGroup(AccountId);
+                    
                     Send(response);
                     SendLobbyServerReadyNotification();
+
+                    GroupManager.CreateGroup(AccountId);
                 }
                 else
                 {
