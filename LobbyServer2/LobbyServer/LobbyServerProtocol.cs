@@ -217,6 +217,7 @@ namespace CentralServer.LobbyServer
 
         public void HandleCustomKeyBindNotification(CustomKeyBindNotification notification)
         {
+            DB.Get().AccountDao.GetAccount(AccountId).AccountComponent.KeyCodeMapping = notification.CustomKeyBinds;
         }
 
         public void HandlePricesRequest(PricesRequest request)
