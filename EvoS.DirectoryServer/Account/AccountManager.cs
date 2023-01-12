@@ -14,7 +14,7 @@ namespace EvoS.DirectoryServer.Account
         public static int DefaultGGAmount = 508;
         public static int DefaultRankedCurrencyAmount = 3;
 
-        public static bool DailyQuestsAvailable = true;
+        public static bool DailyQuestsAvailable = false;
 
         public static CharacterType DefaultCharacterType = CharacterType.Tracker;
         public static GameType DefaultGameType = GameType.PvP;
