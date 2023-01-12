@@ -168,10 +168,19 @@ namespace CentralServer.LobbyServer
                 IsReady = false;
                 UpdateGroupReadyState();
             }
-            Send(new LobbyServerReadyNotification
+            LobbyPlayerGroupInfo info = GroupManager.GetGroupInfo(AccountId);
+
+            GroupUpdateNotification update = new GroupUpdateNotification()
             {
-                GroupInfo = GroupManager.GetGroupInfo(AccountId)
-            });
+                Members = info.Members,
+                GameType = info.SelectedQueueType,
+                SubTypeMask = info.SubTypeMask,
+                AllyDifficulty = BotDifficulty.Medium,
+                EnemyDifficulty = BotDifficulty.Medium,
+                GroupId = GroupManager.GetGroupID(AccountId)
+            };
+
+            Send(update);
         }
 
         public void HandleRegisterGame(RegisterGameClientRequest request)

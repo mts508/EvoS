@@ -4,6 +4,7 @@ using System.Linq;
 using CentralServer.LobbyServer.Matchmaking;
 using CentralServer.LobbyServer.Session;
 using EvoS.Framework.DataAccess;
+using EvoS.Framework.Network.NetworkMessages;
 using EvoS.Framework.Network.Static;
 using EvoS.Framework.Network.WebSocket;
 using log4net;
@@ -176,7 +177,7 @@ namespace CentralServer.LobbyServer.Group
                 {
                     SelectedQueueType = client.SelectedGameType,
                     MemberDisplayName = account.Handle,
-                    // InAGroup = false,
+                    InAGroup = false,
                     // IsLeader = true,
                     Members = new List<UpdateGroupMemberData>(),
                 };
@@ -196,6 +197,19 @@ namespace CentralServer.LobbyServer.Group
             }
             response.SetCharacterInfo(LobbyCharacterInfo.Of(account.CharacterData[account.AccountComponent.LastCharacter]));
             return response;
+        }
+
+        public static long GetGroupID(long accountId)
+        {
+            lock (_lock)
+            {
+                if (PlayerToGroup.TryGetValue(accountId, out long groupId))
+                {
+                    return groupId;
+                }
+            }
+
+            return 0;
         }
 
         private static void OnJoinGroup(long accountId)
