@@ -71,6 +71,7 @@ namespace CentralServer.LobbyServer
             RegisterHandler(new EvosMessageDelegate<GroupLeaveRequest>(HandleGroupLeaveRequest));
             RegisterHandler(new EvosMessageDelegate<SelectBannerRequest>(HandleSelectBannerRequest));
             RegisterHandler(new EvosMessageDelegate<SelectTitleRequest>(HandleSelectTitleRequest));
+            RegisterHandler(new EvosMessageDelegate<UseOverconRequest>(HandleUseOverconRequest));
 
 
             /*
@@ -716,6 +717,30 @@ namespace CentralServer.LobbyServer
                 CurrentTitleID = account.AccountComponent.SelectedTitleID,
                 ResponseId = request.RequestId
             });
+        }
+
+        public void HandleUseOverconRequest(UseOverconRequest request)
+        {
+            UseOverconResponse response = new UseOverconResponse()
+            {
+                ActorId = request.ActorId,
+                OverconId = request.OverconId,
+                ResponseId = request.RequestId
+            };
+
+            Send(response);
+
+            if (CurrentServer != null)
+            {
+                response.ResponseId = 0;
+                foreach (LobbyServerProtocol client in CurrentServer.clients)
+                {
+                    if (client.AccountId != AccountId)
+                    {
+                        client.Send(response);
+                    }
+                }
+            }
         }
 
         public void OnLeaveGroup()
