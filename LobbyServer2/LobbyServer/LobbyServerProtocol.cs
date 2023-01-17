@@ -763,7 +763,6 @@ namespace CentralServer.LobbyServer
             {
                 foreach(LobbyServerProtocol client in CurrentServer.clients)
                 {
-                    log.Info($"Sending GG to {client.UserName}");
                     if (client.AccountId != AccountId)
                     {
                         UseGGPackNotification useGGPackNotification = new UseGGPackNotification()
