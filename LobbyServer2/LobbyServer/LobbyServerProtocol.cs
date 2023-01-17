@@ -72,6 +72,7 @@ namespace CentralServer.LobbyServer
             RegisterHandler(new EvosMessageDelegate<SelectBannerRequest>(HandleSelectBannerRequest));
             RegisterHandler(new EvosMessageDelegate<SelectTitleRequest>(HandleSelectTitleRequest));
             RegisterHandler(new EvosMessageDelegate<UseOverconRequest>(HandleUseOverconRequest));
+            RegisterHandler(new EvosMessageDelegate<UseGGPackRequest>(HandleUseGGPackRequest));
 
 
             /*
@@ -738,6 +739,43 @@ namespace CentralServer.LobbyServer
                     if (client.AccountId != AccountId)
                     {
                         client.Send(response);
+                    }
+                }
+            }
+        }
+
+        public void HandleUseGGPackRequest(UseGGPackRequest request)
+        {
+            PersistedAccountData account = DB.Get().AccountDao.GetAccount(AccountId);
+            UseGGPackResponse response = new UseGGPackResponse()
+            {
+                GGPackUserName = account.UserName,
+                GGPackUserBannerBackground = account.AccountComponent.SelectedBackgroundBannerID,
+                GGPackUserBannerForeground = account.AccountComponent.SelectedForegroundBannerID,
+                GGPackUserRibbon = account.AccountComponent.SelectedRibbonID,
+                GGPackUserTitle = account.AccountComponent.SelectedTitleID,
+                GGPackUserTitleLevel = 1,
+                ResponseId = request.RequestId
+            };
+            Send(response);
+
+            if (CurrentServer != null)
+            {
+                foreach(LobbyServerProtocol client in CurrentServer.clients)
+                {
+                    log.Info($"Sending GG to {client.UserName}");
+                    if (client.AccountId != AccountId)
+                    {
+                        UseGGPackNotification useGGPackNotification = new UseGGPackNotification()
+                        {
+                            GGPackUserName = account.UserName,
+                            GGPackUserBannerBackground = account.AccountComponent.SelectedBackgroundBannerID,
+                            GGPackUserBannerForeground = account.AccountComponent.SelectedForegroundBannerID,
+                            GGPackUserRibbon = account.AccountComponent.SelectedRibbonID,
+                            GGPackUserTitle = account.AccountComponent.SelectedTitleID,
+                            GGPackUserTitleLevel = 1
+                        };
+                        client.Send(useGGPackNotification);
                     }
                 }
             }
