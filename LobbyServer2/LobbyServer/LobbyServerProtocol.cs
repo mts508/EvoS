@@ -329,7 +329,7 @@ namespace CentralServer.LobbyServer
             
             PlayerInfoUpdateResponse response = new PlayerInfoUpdateResponse()
             {
-                PlayerInfo = LobbyPlayerInfo.FromServer(playerInfo, 0, new MatchmakingQueueConfig()),
+                PlayerInfo = LobbyPlayerInfo.FromServer(playerInfo, new MatchmakingQueueConfig()),
                 CharacterInfo = playerInfo.CharacterInfo,
                 OriginalPlayerInfoUpdate = update,
                 ResponseId = request.RequestId

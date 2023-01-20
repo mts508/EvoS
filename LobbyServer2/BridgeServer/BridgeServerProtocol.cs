@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -10,6 +10,7 @@ using EvoS.Framework.Network.NetworkMessages;
 using EvoS.Framework.Network.Static;
 using EvoS.Framework.Network.Unity;
 using log4net;
+using MongoDB.Bson;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
@@ -56,7 +57,7 @@ namespace CentralServer.BridgeServer
             null, // typeof(MonitorHeartbeatResponse),
             typeof(ServerGameSummaryNotification),
             typeof(PlayerDisconnectedNotification),
-            null, // typeof(ServerGameMetricsNotification),
+            typeof(ServerGameMetricsNotification),
             typeof(ServerGameStatusNotification),
             null, // typeof(MonitorHeartbeatNotification),
             null, // typeof(LaunchGameResponse),
