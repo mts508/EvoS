@@ -2,17 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using CentralServer.LobbyServer;
 using CentralServer.LobbyServer.Session;
 using EvoS.Framework.Constants.Enums;
+using EvoS.Framework.Logging;
 using EvoS.Framework.Misc;
 using EvoS.Framework.Network.NetworkMessages;
 using EvoS.Framework.Network.Static;
 using EvoS.Framework.Network.Unity;
 using log4net;
 using MongoDB.Bson;
+using Org.BouncyCastle.Asn1.Ocsp;
 using WebSocketSharp;
 using WebSocketSharp.Server;
+using ILog = log4net.ILog;
 
 namespace CentralServer.BridgeServer
 {
@@ -99,51 +104,72 @@ namespace CentralServer.BridgeServer
                 ServerManager.AddServer(this);
 
                 Send(new RegisterGameServerResponse
-                    {
-                        Success = true
-                    },
+                {
+                    Success = true
+                },
                     callbackId);
             }
             else if (type == typeof(ServerGameSummaryNotification))
             {
                 ServerGameSummaryNotification request = Deserialize<ServerGameSummaryNotification>(networkReader);
-                log.Debug($"< {request.GetType().Name} {DefaultJsonSerializer.Serialize(request)}");
-                log.Info($"Game {GameInfo.Name} at {request.GameSummary.GameServerAddress} finished " +
-                                        $"({request.GameSummary.NumOfTurns} turns), " +
-                                        $"{request.GameSummary.GameResult} {request.GameSummary.TeamAPoints}-{request.GameSummary.TeamBPoints}");
+                log.Info("Game Summary notification");
+                log.Info(request.ToJson());
+
+                log.Info($"< {request.GetType().Name} {DefaultJsonSerializer.Serialize(request)}");
+                log.Info($"Game {GameInfo.Name} finished ");
+
+                List<BadgeAndParticipantInfo> badges;
+                if (request.GameSummary != null)
+                {
+                    log.Info($"({request.GameSummary.NumOfTurns} turns), " +
+                             $"{request.GameSummary.GameResult} {request.GameSummary.TeamAPoints}-{request.GameSummary.TeamBPoints}");
+                    badges = request.GameSummary.BadgeAndParticipantsInfo;
+                }
+                else
+                {
+                    log.Error("Received null GameSummary. stub");
+                    badges = new List<BadgeAndParticipantInfo>();
+                }
+
                 foreach (LobbyServerProtocolBase client in clients)
                 {
                     MatchResultsNotification response = new MatchResultsNotification
                     {
-                        // TODO
-                        BadgeAndParticipantsInfo = request.GameSummary.BadgeAndParticipantsInfo
+                        BadgeAndParticipantsInfo = badges,
+                        BaseXpGained = 100,
+                        CurrencyRewards = new List<MatchResultsNotification.CurrencyReward>()
                     };
                     client.Send(response);
                 }
-
-                Send(new ShutdownGameRequest());
+                if (request.GameSummary != null)
+                {
+                    GameInfo.GameResult = request.GameSummary.GameResult;
+                }
+                else
+                {
+                    // default value
+                    GameInfo.GameResult = GameResult.TieGame;
+                }
+                
+                UpdateGameInfoToPlayers();
             }
             else if (type == typeof(PlayerDisconnectedNotification))
             {
                 PlayerDisconnectedNotification request = Deserialize<PlayerDisconnectedNotification>(networkReader);
                 log.Debug($"< {request.GetType().Name} {DefaultJsonSerializer.Serialize(request)}");
                 log.Info($"Player {request.PlayerInfo.AccountId} left game {GameInfo.GameServerProcessCode}");
+
+                OnPlayerDisconnected(request.PlayerInfo.AccountId);
                 
-                foreach (LobbyServerProtocol client in clients)
-                {
-                    if (client.AccountId == request.PlayerInfo.AccountId)
-                    {
-                        client.CurrentServer = null;
-                        break;
-                    }
-                }
             }
             else if (type == typeof(ServerGameStatusNotification))
             {
                 ServerGameStatusNotification request = Deserialize<ServerGameStatusNotification>(networkReader);
                 log.Debug($"< {request.GetType().Name} {DefaultJsonSerializer.Serialize(request)}");
                 log.Info($"Game {GameInfo.Name} {request.GameStatus}");
-                GameStatus = request.GameStatus;
+
+                UpdateGameStatus(request.GameStatus, true);
+                
                 if (GameStatus == GameStatus.Stopped)
                 {
                     foreach (LobbyServerProtocol client in clients)
@@ -151,6 +177,11 @@ namespace CentralServer.BridgeServer
                         client.CurrentServer = null;
                     }
                 }
+            }
+            else if (type == typeof(ServerGameMetricsNotification))
+            {
+                ServerGameMetricsNotification request = Deserialize<ServerGameMetricsNotification>(networkReader);
+                log.Info($"Game {GameInfo.Name} is on turn {request.CurrentTurn} with score {request.TeamAPoints}/{request.TeamBPoints}");
             }
             else
             {
