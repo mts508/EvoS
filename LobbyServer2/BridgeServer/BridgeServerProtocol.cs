@@ -112,10 +112,8 @@ namespace CentralServer.BridgeServer
             else if (type == typeof(ServerGameSummaryNotification))
             {
                 ServerGameSummaryNotification request = Deserialize<ServerGameSummaryNotification>(networkReader);
-                log.Info("Game Summary notification");
-                log.Info(request.ToJson());
 
-                log.Info($"< {request.GetType().Name} {DefaultJsonSerializer.Serialize(request)}");
+                log.Debug($"< {request.GetType().Name} {DefaultJsonSerializer.Serialize(request)}");
                 log.Info($"Game {GameInfo.Name} finished ");
 
                 List<BadgeAndParticipantInfo> badges;
@@ -181,7 +179,10 @@ namespace CentralServer.BridgeServer
             else if (type == typeof(ServerGameMetricsNotification))
             {
                 ServerGameMetricsNotification request = Deserialize<ServerGameMetricsNotification>(networkReader);
-                log.Info($"Game {GameInfo.Name} is on turn {request.CurrentTurn} with score {request.TeamAPoints}/{request.TeamBPoints}");
+                if (request.GameMetrics != null)
+                {
+                    log.Debug($"Game {GameInfo.Name} is on turn {request.GameMetrics.CurrentTurn} with score {request.GameMetrics.TeamAPoints}/{request.GameMetrics.TeamBPoints}");
+                }
             }
             else
             {
@@ -287,7 +288,11 @@ namespace CentralServer.BridgeServer
 
             foreach (long player in GetPlayers())
             {
-                SessionManager.GetClientConnection(player).Send(notification);
+                LobbyServerProtocol playerConnection = SessionManager.GetClientConnection(player);
+                if (playerConnection != null)
+                {
+                    playerConnection.Send(notification);
+                }
             }
         }
 
@@ -301,7 +306,11 @@ namespace CentralServer.BridgeServer
                     TeamInfo = LobbyTeamInfo.FromServer(this.TeamInfo, new MatchmakingQueueConfig()),
                     PlayerInfo = LobbyPlayerInfo.FromServer(SessionManager.GetPlayerInfo(player), new MatchmakingQueueConfig()) 
                 };
-                SessionManager.GetClientConnection(player).Send(notification);
+                LobbyServerProtocol playerConnection = SessionManager.GetClientConnection(player);
+                if (playerConnection != null)
+                {
+                    playerConnection.Send(notification);
+                }
             }
         }
 
