@@ -243,5 +243,87 @@ namespace CentralServer.BridgeServer
 
             return num;
         }
+
+        public void UpdateGameStatus(GameStatus status, bool notify = false)
+        {
+            // Update GameInfo's GameStatus
+            GameStatus = status;
+            GameInfo.GameStatus = status;
+
+            // If status is not None, notify players of the change
+            if (status == GameStatus.None || !notify) return;
+            GameStatusNotification notification = new GameStatusNotification() { GameStatus = status};
+
+            foreach (long player in GetPlayers())
+            {
+                SessionManager.GetClientConnection(player).Send(notification);
+            }
+        }
+
+        public void UpdateGameInfoToPlayers()
+        {
+            foreach(long player in GetPlayers())
+            {
+                GameInfoNotification notification = new GameInfoNotification()
+                {
+                    GameInfo = this.GameInfo,
+                    TeamInfo = LobbyTeamInfo.FromServer(this.TeamInfo, new MatchmakingQueueConfig()),
+                    PlayerInfo = LobbyPlayerInfo.FromServer(SessionManager.GetPlayerInfo(player), new MatchmakingQueueConfig()) 
+                };
+                SessionManager.GetClientConnection(player).Send(notification);
+            }
+        }
+
+        public void OnPlayerUsedGGPack(long accountId)
+        {
+            int ggPackUsedAccountIDs = 0;
+            GameInfo.ggPackUsedAccountIDs.TryGetValue(accountId, out ggPackUsedAccountIDs);
+            GameInfo.ggPackUsedAccountIDs[accountId] = ggPackUsedAccountIDs + 1;
+
+            UpdateGameInfoToPlayers();
+        }
+
+        public void OnPlayerDisconnected(long accountId)
+        {
+            LobbyServerProtocol clientToRemove = null;
+
+            foreach (LobbyServerProtocol client in clients)
+            {
+                if (client.AccountId == accountId)
+                {
+                    client.CurrentServer = null;
+                    clientToRemove = client;
+                    break;
+                }
+            }
+
+            if (clientToRemove != null)
+            {
+                clients.Remove(clientToRemove);
+                clientToRemove.CurrentServer = null;
+
+                GameStatusNotification notify = new GameStatusNotification()
+                {
+                    GameServerProcessCode = ProcessCode,
+                    GameStatus = GameStatus.Stopped // TODO check if there is a better way to make client leave mid-game
+                };
+
+                /*
+                 * TODO: This seems to disconnect the player from the server
+                    2019-04-29 17:52:13.373+03:00 [INF] Received Game Assignment Notification  (assigned=True assigning=False reassigning=False)
+                    2019-04-29 17:52:13.373+03:00 [INF] Unassigned from game 0a101c39-5cc7-077f (wss://208.94.25.140:6148) [RobotFactory_Deathmatch PvP GenericPvP]
+                 */
+                clientToRemove.Send(notify);
+            }
+
+            
+            if (clients.Count == 0)
+            {
+                log.Info("No more players in game server. Sending shutdown request");
+                Send(new ShutdownGameRequest());
+            }
+        }
+
+
     }
 }
