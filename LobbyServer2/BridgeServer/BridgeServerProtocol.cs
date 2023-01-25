@@ -344,10 +344,6 @@ namespace CentralServer.BridgeServer
                 clientToRemove.CurrentServer = null;
 
                 // Notify Game Unassignment
-                LobbyGameInfo gameInfo = GameInfo.Clone();
-                gameInfo.GameServerProcessCode = "";
-                gameInfo.GameStatus = GameStatus.Stopped;
-
                 GameAssignmentNotification assignmentNotification = new GameAssignmentNotification()
                 {
                     GameResult = GameInfo.GameResult,
