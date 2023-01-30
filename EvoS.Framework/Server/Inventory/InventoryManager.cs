@@ -35,7 +35,7 @@ namespace EvoS.DirectoryServer.Inventory
 
         public static List<int> GetUnlockedOverconIDs(long accountId)
         {
-            return new List<int>() { 4, 1, 2, 9, 10, 5, 3, 7, 8, 6, 12, 13, 11, 19, 20, 5, 16, 17, 15, 18, 14, 24, 25, 26, 27, 28, 29, 29, 39, 37, 38, 41, 40, 43, 42, 44, 45, 46, 47, 30, 31, 32, 33, 34 };
+            return new List<int>() { 4, 1, 2, 9, 10, 5, 3, 7, 8, 6, 12, 13, 11, 19, 20, 5, 16, 17, 15, 18, 14, 21, 24, 25, 26, 27, 28, 29, 29, 39, 37, 38, 41, 40, 43, 42, 44, 45, 46, 47, 30, 31, 32, 33, 34 };
         }
 
         public static List<int> GetUnlockedTitleIDs(long accountId)
