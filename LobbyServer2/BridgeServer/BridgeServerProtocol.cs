@@ -110,20 +110,30 @@ namespace CentralServer.BridgeServer
             }
             else if (type == typeof(ServerGameSummaryNotification))
             {
-                ServerGameSummaryNotification request = Deserialize<ServerGameSummaryNotification>(networkReader);
-                log.Debug($"< {request.GetType().Name} {DefaultJsonSerializer.Serialize(request)}");
-                log.Info($"Game {GameInfo.Name} at {request.GameSummary.GameServerAddress} finished " +
-                                        $"({request.GameSummary.NumOfTurns} turns), " +
-                                        $"{request.GameSummary.GameResult} {request.GameSummary.TeamAPoints}-{request.GameSummary.TeamBPoints}");
-                foreach (LobbyServerProtocolBase client in clients)
+                try 
                 {
-                    MatchResultsNotification response = new MatchResultsNotification
+                    ServerGameSummaryNotification request = Deserialize<ServerGameSummaryNotification>(networkReader);
+
+                    if (request.GameSummary == null) request.GameSummary = new LobbyGameSummary();
+                    if (request.GameSummary.BadgeAndParticipantsInfo == null) request.GameSummary.BadgeAndParticipantsInfo = new List<BadgeAndParticipantInfo>();
+                    log.Debug($"< {request.GetType().Name} {DefaultJsonSerializer.Serialize(request)}");
+                    log.Info($"Game {GameInfo.Name} at {request.GameSummary.GameServerAddress} finished " +
+                                            $"({request.GameSummary.NumOfTurns} turns), " +
+                                            $"{request.GameSummary.GameResult} {request.GameSummary.TeamAPoints}-{request.GameSummary.TeamBPoints}");
+                    foreach (LobbyServerProtocolBase client in clients)
                     {
-                        // TODO
-                        BadgeAndParticipantsInfo = request.GameSummary.BadgeAndParticipantsInfo
-                    };
-                    client.Send(response);
+                        MatchResultsNotification response = new MatchResultsNotification
+                        {
+                            // TODO
+                            BadgeAndParticipantsInfo = request.GameSummary.BadgeAndParticipantsInfo
+                        };
+                        client.Send(response);
+                    }
+                } catch(NullReferenceException ex)
+                {
+                    log.Error(ex);
                 }
+                
 
                 Send(new ShutdownGameRequest());
             }
