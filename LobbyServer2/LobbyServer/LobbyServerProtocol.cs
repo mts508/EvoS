@@ -406,15 +406,17 @@ namespace CentralServer.LobbyServer
             };
             Send(response);
 
+            Send(new GameStatusNotification() { GameStatus = GameStatus.Stopped });
+            Send(new GameAssignmentNotification()
+            {
+                GameInfo = null,
+                GameResult = GameResult.NoResult,
+                Reconnection = false
+            });
+
             if (CurrentServer != null)
             {
                 CurrentServer.clients.Remove(this);
-                GameStatusNotification notify = new GameStatusNotification()
-                {
-                    GameServerProcessCode = CurrentServer.ProcessCode,
-                    GameStatus = GameStatus.Stopped // TODO check if there is a better way to make client leave mid-game
-                };
-                Send(notify);
                 CurrentServer = null; // we will probably want to save it somewhere for reconnection
             }
         }
