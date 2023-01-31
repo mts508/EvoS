@@ -15,10 +15,10 @@ namespace EvoS.Framework.Network.NetworkMessages
         [EvosMessage(181)]
         public enum MatchmakingQueueMessage
         {
-            Unicode001D,
-            Unicode000E,
-            Unicode0012,
-            Unicode0015
+            None,
+            QueueConfirmed, // starts counter apparently
+            ReQueued,
+            RuinedGameStartSoThrownOutOfQueue
         }
     }
 }
