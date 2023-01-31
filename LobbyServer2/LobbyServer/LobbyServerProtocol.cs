@@ -799,7 +799,7 @@ namespace CentralServer.LobbyServer
             Send(new ChatNotification
             {
                 ConsoleMessageType = ConsoleMessageType.SystemMessage,
-                Text = $"You are playing on {server.Name} server. " +
+                Text = (server.Name != "" ? $"You are playing on {server.Name} server. " : "") +
                        (server.BuildVersion != "" ? $"Build {server.BuildVersion}. " : "") +
                        $"Game {new DateTime(server.GameInfo.CreateTimestamp):yyyy_MM_dd__HH_mm_ss}."
             });
