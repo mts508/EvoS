@@ -96,9 +96,6 @@ namespace CentralServer.LobbyServer.Matchmaking
             foreach (GameSubType subType in MatchmakingQueueInfo.GameConfig.SubTypes)
             {
                 List<MatchmakingGroupInfo> groups = new List<MatchmakingGroupInfo>();
-                
-                int requiredPlayers = subType.TeamAPlayers + subType.TeamBPlayers;
-                int playersInGroups = 0;
 
                 lock (GroupManager.Lock)
                 {
