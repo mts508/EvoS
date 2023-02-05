@@ -76,6 +76,7 @@ namespace CentralServer.LobbyServer
             RegisterHandler(new EvosMessageDelegate<UseGGPackRequest>(HandleUseGGPackRequest));
             RegisterHandler(new EvosMessageDelegate<UpdateUIStateRequest>(HandleUpdateUIStateRequest));
             RegisterHandler(new EvosMessageDelegate<GroupChatRequest>(HandleGroupChatRequest));
+            RegisterHandler(new EvosMessageDelegate<RejoinGameRequest>(HandleRejoinGameRequest));
 
             /* TODO: adding these to
             RegisterHandler(new EvosMessageDelegate<PurchaseModResponse>(HandlePurchaseModRequest));
@@ -905,6 +906,11 @@ namespace CentralServer.LobbyServer
                 LobbyServerProtocol connection = SessionManager.GetClientConnection(accountID);
                 connection.Send(message);
             }
+        }
+
+        public void HandleRejoinGameRequest(RejoinGameRequest request)
+        {
+            Send(new RejoinGameResponse() { ResponseId = request.RequestId });
         }
 
         public void OnLeaveGroup()
