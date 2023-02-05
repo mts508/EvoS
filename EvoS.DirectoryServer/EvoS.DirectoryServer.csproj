@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EvoS.Framework\EvoS.Framework.csproj" />
+    <ProjectReference Include="..\LobbyServer2\CentralServer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
