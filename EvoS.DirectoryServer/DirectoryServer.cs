@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Threading;
+using CentralServer.LobbyServer.Session;
 using EvoS.DirectoryServer.Account;
 using EvoS.DirectoryServer.Inventory;
 using EvoS.Framework;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using static EvoS.Framework.DataAccess.Daos.LoginDao;
 
 namespace EvoS.DirectoryServer
 {
@@ -69,13 +71,18 @@ namespace EvoS.DirectoryServer
 
         private static AssignGameClientResponse ProcessRequest(AssignGameClientRequest request)
         {
+            if (request.SessionInfo.SessionToken!= 0 && request.SessionInfo.ReconnectSessionToken != 0)
+            {
+                return HandleReconnection(request);
+            }
+
             AssignGameClientResponse response = new AssignGameClientResponse
-                {
-                    RequestId = request.RequestId,
-                    ResponseId = request.ResponseId,
-                    Success = true,
-                    ErrorMessage = ""
-                };
+            {
+                RequestId = request.RequestId,
+                ResponseId = request.ResponseId,
+                Success = true,
+                ErrorMessage = ""
+            };
 
             string username = request.AuthInfo.UserName;
             string password = request.AuthInfo._Password;
@@ -137,16 +144,8 @@ namespace EvoS.DirectoryServer
                 DB.Get().AccountDao.UpdateAccount(account);
             }
 
-            request.SessionInfo.SessionToken = 0;
 
-            response.SessionInfo = request.SessionInfo;
-            response.SessionInfo.AccountId = account.AccountId;
-            response.SessionInfo.Handle = account.Handle;
-            response.SessionInfo.ConnectionAddress = "127.0.0.1";
-            response.SessionInfo.ProcessCode = "";
-            response.SessionInfo.FakeEntitlements = "";
-            response.SessionInfo.LanguageCode = "EN"; // Needs to be uppercase
-
+            response.SessionInfo = SessionManager.CreateSession(accountId);
             response.LobbyServerAddress = EvosConfiguration.GetLobbyServerAddress();
 
             LobbyGameClientProxyInfo proxyInfo = new LobbyGameClientProxyInfo
@@ -160,6 +159,37 @@ namespace EvoS.DirectoryServer
 
             response.ProxyInfo = proxyInfo;
             return response;
+        }
+
+        private static AssignGameClientResponse HandleReconnection(AssignGameClientRequest request)
+        {
+            LobbySessionInfo session = SessionManager.GetSessionInfo(request.SessionInfo.AccountId);
+            if (session.SessionToken != request.SessionInfo.SessionToken)
+            {
+                return Fail(request, "ReconnectionError: SessionToken invalid");
+            }
+
+            if (session.ReconnectSessionToken != request.SessionInfo.ReconnectSessionToken)
+            {
+                return Fail(request, "ReconnectionError: ReconnectSessionToken invalid");
+            }
+
+            return new AssignGameClientResponse
+            {
+                Success = true,
+                RequestId = 0,
+                ResponseId = request.RequestId,
+                LobbyServerAddress = EvosConfiguration.GetLobbyServerAddress(),
+                SessionInfo = session,
+                ProxyInfo = new LobbyGameClientProxyInfo
+                {
+                    AccountId = session.AccountId,
+                    SessionToken = session.SessionToken,
+                    AssignmentTime = 1565574095,
+                    Handle = session.Handle,
+                    Status = ClientProxyStatus.Assigned
+                }
+            };
         }
 
         private static bool PatchAccountData(PersistedAccountData account)
@@ -184,8 +214,8 @@ namespace EvoS.DirectoryServer
         {
             return new AssignGameClientResponse
             {
-                RequestId = request.RequestId,
-                ResponseId = request.ResponseId,
+                RequestId = 0,
+                ResponseId = request.RequestId,
                 Success = false,
                 ErrorMessage = reason
             };
