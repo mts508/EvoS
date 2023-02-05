@@ -19,6 +19,7 @@ using log4net;
 using Newtonsoft.Json;
 using WebSocketSharp;
 using WebSocketSharp.Server;
+using MongoDB.Bson;
 
 namespace CentralServer.LobbyServer
 {
@@ -202,17 +203,15 @@ namespace CentralServer.LobbyServer
                     log.Info(string.Format(Messages.LoginSuccess, this.UserName));
                     RegisterGameClientResponse response = new RegisterGameClientResponse
                     {
-                        // Note: If we send AuthInfo back, it will override the one currently set up on the client
-                        // which will cause issues if the client attempts to reconnect at some point.
-                        AuthInfo = new AuthInfo()
-                        {
-                            AccountId = AccountId,
-                            Handle = playerInfo.Handle
-                        },
-                        SessionInfo = SessionManager.GetSessionInfo(request.AuthInfo.AccountId),
+                        AuthInfo = request.AuthInfo, // Send original, if some data is missing on a new instance the game fails
+                        SessionInfo = SessionManager.GetSessionInfo(request.SessionInfo.AccountId),
                         ResponseId = request.RequestId
                     };
-                    
+
+                    // Overwrite the values we need
+                    response.AuthInfo.AccountId = AccountId;
+                    response.AuthInfo.Handle = playerInfo.Handle;
+
                     Send(response);
                     SendLobbyServerReadyNotification();
 
