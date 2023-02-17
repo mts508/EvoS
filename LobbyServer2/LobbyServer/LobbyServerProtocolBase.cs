@@ -30,7 +30,7 @@ namespace CentralServer.LobbyServer
         private Dictionary<Type, EvosMessageDelegate<WebSocketMessage>> messageHandlers = new Dictionary<Type, EvosMessageDelegate<WebSocketMessage>>();
         public long AccountId;
         public string UserName;
-        
+        public long SessionToken;
         public GameType SelectedGameType;
         public ushort SelectedSubTypeMask;
         public BotDifficulty AllyDifficulty;

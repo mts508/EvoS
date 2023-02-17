@@ -11,6 +11,36 @@ namespace EvoS.Framework.Network.Static
     [EvosMessage(554)]
     public class PersistedAccountData : ICloneable
     {
+
+        [BsonId]
+        public long AccountId { get; set; }
+        public string UserName { get; set; }
+        public string Handle { get; set; }
+        [EvosMessage(561, ignoreGenericArgs: true)]
+        public SchemaVersion<AccountSchemaChange> SchemaVersion { get; set; }
+        public DateTime CreateDate { get; set; }
+        public DateTime UpdateDate { get; set; }
+        public AccountComponent AccountComponent { get; set; }
+        public AdminComponent AdminComponent { get; set; }
+        public BankComponent BankComponent { get; set; }
+        public ExperienceComponent ExperienceComponent { get; set; }
+        public InventoryComponent InventoryComponent { get; set; }
+        public QuestComponent QuestComponent { get; set; }
+        public SocialComponent SocialComponent { get; set; }
+
+        [EvosMessage(586)]
+        public Dictionary<CharacterType, PersistedCharacterData> CharacterData { get; set; }
+        [EvosMessage(602)]
+        private List<PersistedCharacterMatchData> AddedMatchData { get; set; }
+
+        [JsonIgnore] public string PersistedUserName { get; set; }
+        [JsonIgnore] public string PersistedHandle { get; set; }
+        [JsonIgnore] public bool Snapshotting { get; set; }
+        [JsonIgnore] public string SnapshottingUserName { get; set; }
+        [JsonIgnore] public PersistedAccountDataSnapshotReason SnapshotReason { get; set; }
+
+        [JsonIgnore] public string SnapshotNote { get; set; }
+
         public PersistedAccountData()
         {
             SchemaVersion = new SchemaVersion<AccountSchemaChange>();
@@ -26,51 +56,7 @@ namespace EvoS.Framework.Network.Static
             QuestComponent = new QuestComponent();
         }
         
-        [BsonId]
-        public long AccountId { get; set; }
-
-        public string UserName { get; set; }
-
-        public string Handle { get; set; }
-
-        [EvosMessage(561, ignoreGenericArgs: true)]
-        public SchemaVersion<AccountSchemaChange> SchemaVersion { get; set; }
-
-        public DateTime CreateDate { get; set; }
-
-        public DateTime UpdateDate { get; set; }
-
-        public AccountComponent AccountComponent { get; set; }
-
-        public AdminComponent AdminComponent { get; set; }
-
-        public BankComponent BankComponent { get; set; }
-
-        public ExperienceComponent ExperienceComponent { get; set; }
-
-        public InventoryComponent InventoryComponent { get; set; }
-
-        public QuestComponent QuestComponent { get; set; }
-
-        public SocialComponent SocialComponent { get; set; }
-
-        [EvosMessage(586)]
-        public Dictionary<CharacterType, PersistedCharacterData> CharacterData { get; set; }
-
-        [EvosMessage(602)]
-        private List<PersistedCharacterMatchData> AddedMatchData { get; set; }
-
-        [JsonIgnore] public string PersistedUserName { get; set; }
-
-        [JsonIgnore] public string PersistedHandle { get; set; }
-
-        [JsonIgnore] public bool Snapshotting { get; set; }
-
-        [JsonIgnore] public string SnapshottingUserName { get; set; }
-
-        [JsonIgnore] public PersistedAccountDataSnapshotReason SnapshotReason { get; set; }
-
-        [JsonIgnore] public string SnapshotNote { get; set; }
+        
 
 //        [JsonIgnore]
 //        public int SeasonLevel
@@ -114,7 +100,8 @@ namespace EvoS.Framework.Network.Static
                 ExperienceComponent = ExperienceComponent,
                 InventoryComponent = InventoryComponent.CloneForClient(),
                 SocialComponent = SocialComponent,
-                QuestComponent = QuestComponent
+                QuestComponent = QuestComponent,
+                CharacterData = CharacterData, // TODO clone
             };
         }
 

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Threading;
+using CentralServer.LobbyServer;
 using CentralServer.LobbyServer.Session;
 using EvoS.DirectoryServer.Account;
 using EvoS.DirectoryServer.Inventory;
@@ -71,8 +72,13 @@ namespace EvoS.DirectoryServer
 
         private static AssignGameClientResponse ProcessRequest(AssignGameClientRequest request)
         {
-            if (request.SessionInfo.SessionToken!= 0 && request.SessionInfo.ReconnectSessionToken != 0)
+            SessionTicketData ticketData = SessionTicketData.FromString(request.AuthInfo.TicketData);
+            if (ticketData != null)
             {
+                request.SessionInfo.AccountId = ticketData.AccountID;
+                request.SessionInfo.SessionToken = ticketData.SessionToken;
+                request.SessionInfo.ReconnectSessionToken = ticketData.ReconnectionSessionToken;
+
                 return HandleReconnection(request);
             }
 
@@ -144,7 +150,6 @@ namespace EvoS.DirectoryServer
                 DB.Get().AccountDao.UpdateAccount(account);
             }
 
-
             response.SessionInfo = SessionManager.CreateSession(accountId);
             response.LobbyServerAddress = EvosConfiguration.GetLobbyServerAddress();
 
@@ -173,6 +178,9 @@ namespace EvoS.DirectoryServer
             {
                 return Fail(request, "ReconnectionError: ReconnectSessionToken invalid");
             }
+
+            SessionManager.CleanSessionAfterReconnect(request.SessionInfo.AccountId);
+            
 
             return new AssignGameClientResponse
             {

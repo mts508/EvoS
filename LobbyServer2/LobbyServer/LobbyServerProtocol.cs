@@ -201,16 +201,24 @@ namespace CentralServer.LobbyServer
                 if (playerInfo != null)
                 {
                     log.Info(string.Format(Messages.LoginSuccess, this.UserName));
+                    LobbySessionInfo sessionInfo = SessionManager.GetSessionInfo(request.SessionInfo.AccountId);
                     RegisterGameClientResponse response = new RegisterGameClientResponse
                     {
                         AuthInfo = request.AuthInfo, // Send original, if some data is missing on a new instance the game fails
-                        SessionInfo = SessionManager.GetSessionInfo(request.SessionInfo.AccountId),
+                        SessionInfo = sessionInfo,
                         ResponseId = request.RequestId
                     };
 
                     // Overwrite the values we need
                     response.AuthInfo.AccountId = AccountId;
                     response.AuthInfo.Handle = playerInfo.Handle;
+                    response.AuthInfo.TicketData = new SessionTicketData
+                    {
+                        AccountID = AccountId,
+                        SessionToken = sessionInfo.SessionToken,
+                        ReconnectionSessionToken = sessionInfo.ReconnectSessionToken
+                    }.ToStringWithSignature();
+                    
 
                     Send(response);
                     SendLobbyServerReadyNotification();
@@ -909,7 +917,9 @@ namespace CentralServer.LobbyServer
 
         public void HandleRejoinGameRequest(RejoinGameRequest request)
         {
-            Send(new RejoinGameResponse() { ResponseId = request.RequestId });
+            log.Info($"TODO: {UserName} want to reconnect to a game");
+            // log.Info(request.ToJson());
+            // Send(new RejoinGameResponse() { ResponseId = request.RequestId });
         }
 
         public void OnLeaveGroup()
@@ -933,6 +943,11 @@ namespace CentralServer.LobbyServer
                        (server.BuildVersion != "" ? $"Build {server.BuildVersion}. " : "") +
                        $"Game {new DateTime(server.GameInfo.CreateTimestamp):yyyy_MM_dd__HH_mm_ss}."
             });
+        }
+
+        public void CloseConnection()
+        {
+            this.WebSocket.Close();
         }
     }
 }

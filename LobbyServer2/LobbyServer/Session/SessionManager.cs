@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using CentralServer.LobbyServer.Group;
 using EvoS.DirectoryServer.Account;
 using EvoS.Framework.Constants.Enums;
 using EvoS.Framework.DataAccess;
@@ -18,12 +19,14 @@ namespace CentralServer.LobbyServer.Session
 
         public static LobbyServerPlayerInfo OnPlayerConnect(LobbyServerProtocol client, RegisterGameClientRequest registerRequest)
         {
+            if (registerRequest == null) return null;
+
             lock (Sessions)
             {
-                if (registerRequest == null || registerRequest.SessionInfo == null) return null;
-
+                if (registerRequest.SessionInfo == null) return null;
+                if (registerRequest.SessionInfo.SessionToken == null || registerRequest.SessionInfo.SessionToken == 0) return null;
+                
                 LobbySessionInfo sessionInfo = GetSessionInfo(registerRequest.SessionInfo.AccountId);
-
 
                 if (sessionInfo == null) return null; // Session not found
                 if (sessionInfo.SessionToken != registerRequest.SessionInfo.SessionToken) return null; // Session token do not match
@@ -36,6 +39,7 @@ namespace CentralServer.LobbyServer.Session
                 client.UserName = account.UserName;
                 client.SelectedGameType = GameType.PvP;
                 client.SelectedSubTypeMask = 0;
+                client.SessionToken = sessionInfo.SessionToken;
 
                 LobbyServerPlayerInfo playerInfo = UpdateLobbyServerPlayerInfo(account.AccountId);
                 ActiveConnections.TryAdd(client.AccountId, client);
@@ -76,7 +80,13 @@ namespace CentralServer.LobbyServer.Session
             lock (Sessions)
             {
                 ActivePlayers.TryRemove(client.AccountId, out _);
-                ActiveConnections.TryRemove(client.AccountId, out _);
+                LobbySessionInfo session = null;
+                Sessions.TryGetValue(client.AccountId, out _);
+
+                if (session != null && session.SessionToken == client.SessionToken)
+                {
+                    ActiveConnections.TryRemove(client.AccountId, out _);
+                }
             }
         }
 
@@ -138,6 +148,17 @@ namespace CentralServer.LobbyServer.Session
             Sessions.TryAdd(accountId, sessionInfo);
 
             return sessionInfo;
+        }
+
+        public static void CleanSessionAfterReconnect(long accountId)
+        {
+            LobbyServerProtocol client = null;
+            ActiveConnections.TryGetValue(accountId, out client);
+            if (client != null)
+            {
+                client.WebSocket.Close();
+                ActiveConnections.TryRemove(accountId, out client);
+            }
         }
 
         private static long GenerateToken(string a)
