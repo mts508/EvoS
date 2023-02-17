@@ -83,6 +83,8 @@ namespace CentralServer.LobbyServer.Session
                 LobbySessionInfo session = null;
                 Sessions.TryGetValue(client.AccountId, out _);
 
+                // Sometimes on reconnections we first have the new connection and then we receive the previous disconnection
+                // To avoid deleting the new connection, we check if the sessiontoken is the same
                 if (session != null && session.SessionToken == client.SessionToken)
                 {
                     ActiveConnections.TryRemove(client.AccountId, out _);
