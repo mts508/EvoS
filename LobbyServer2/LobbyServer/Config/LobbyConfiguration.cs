@@ -20,6 +20,8 @@ namespace EvoS.Framework
         public bool GameTypePvPAvailable = true;
         public bool GameTypeRankedAvailable = false;
         public bool GameTypeCustomAvailable = false;
+        public int MaxGroupSize = 5;
+        public string AdminChannelWebhook = "";
 
         private static LobbyConfiguration GetInstance()
         {
@@ -87,6 +89,16 @@ namespace EvoS.Framework
         public static bool GetGameTypeCustomAvailable()
         {
             return GetInstance().GameTypeCustomAvailable;
+        }
+
+        public static int GetMaxGroupSize()
+        {
+            return GetInstance().MaxGroupSize > 5 ? 5 : GetInstance().MaxGroupSize;
+        }
+
+        public static string GetAdminChannelWebhook()
+        {
+            return GetInstance().AdminChannelWebhook;
         }
     }
 }

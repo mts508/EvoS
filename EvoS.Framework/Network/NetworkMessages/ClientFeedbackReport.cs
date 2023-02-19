@@ -18,18 +18,18 @@ namespace EvoS.Framework.Network.NetworkMessages
         [EvosMessage(688, typeof(ClientFeedbackReport.FeedbackReason))]
         public enum FeedbackReason
         {
-			Suggestion,
-			Bug,
-			u0012,
-			u0015,
-			u0016,
-			u0013,
-			u0018,
-			u0009,
-			u0019,
-			u0011,
-			u001A,
-			u0004
-		}
-    }
+            None,
+            Suggestion,
+            Bug,
+            UnsportsmanlikeConduct,
+            VerbalHarassment,
+            LeavingTheGameAFK,
+            HateSpeech,
+            IntentionallyFeeding,
+            SpammingAdvertising,
+            OffensiveName,
+            Other,
+            Botting
+        }
+	}
 }

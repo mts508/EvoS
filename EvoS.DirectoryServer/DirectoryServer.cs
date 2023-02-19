@@ -203,6 +203,11 @@ namespace EvoS.DirectoryServer
 
         private static bool PatchAccountData(PersistedAccountData account)
         {
+
+#if DEBUG
+            account.AccountComponent.AppliedEntitlements.TryAdd("DEVELOPER_ACCESS", 1);
+#endif
+
             foreach (PersistedCharacterData persistedCharacterData in account.CharacterData.Values)
             {
                 persistedCharacterData.CharacterComponent.UnlockSkinsAndTaunts(persistedCharacterData.CharacterType);
@@ -215,6 +220,12 @@ namespace EvoS.DirectoryServer
             if (EvosStoreConfiguration.AreOverconsFree()) account.AccountComponent.UnlockedOverconIDs = InventoryManager.GetUnlockedOverconIDs(account.AccountId);
             if (EvosStoreConfiguration.AreTitlesFree()) account.AccountComponent.UnlockedTitleIDs = InventoryManager.GetUnlockedTitleIDs(account.AccountId);
             if (EvosStoreConfiguration.AreBannersFree()) account.AccountComponent.UnlockedBannerIDs = InventoryManager.GetUnlockedBannerIDs(account.AccountId);
+
+            if (account.AccountComponent.AppliedEntitlements.ContainsKey("DEVELOPER_ACCESS"))
+            {
+                //Give developers access to the Developer title
+                account.AccountComponent.UnlockedTitleIDs.Add(26);
+            }
 
             return true;
         }

@@ -20,6 +20,8 @@ using Newtonsoft.Json;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 using MongoDB.Bson;
+using Discord.Webhook;
+using Discord;
 
 namespace CentralServer.LobbyServer
 {
@@ -48,7 +50,7 @@ namespace CentralServer.LobbyServer
         public bool IsInQueue() => MatchmakingManager.IsQueued(GroupManager.GetPlayerGroup(AccountId));
         
         public bool IsReady { get; private set; }
-        
+
         protected override void HandleOpen()
         {
             RegisterHandler(new EvosMessageDelegate<RegisterGameClientRequest>(HandleRegisterGame));
@@ -70,24 +72,28 @@ namespace CentralServer.LobbyServer
             RegisterHandler(new EvosMessageDelegate<ChatNotification>(HandleChatNotification));
             RegisterHandler(new EvosMessageDelegate<GroupInviteRequest>(HandleGroupInviteRequest));
             RegisterHandler(new EvosMessageDelegate<GroupConfirmationResponse>(HandleGroupConfirmationResponse));
+            RegisterHandler(new EvosMessageDelegate<GroupSuggestionResponse>(HandleGroupSuggestionResponse));
             RegisterHandler(new EvosMessageDelegate<GroupLeaveRequest>(HandleGroupLeaveRequest));
+            RegisterHandler(new EvosMessageDelegate<GroupKickRequest>(HandleGroupKickRequest));
+            RegisterHandler(new EvosMessageDelegate<GroupPromoteRequest>(HandleGroupPromoteRequest));
             RegisterHandler(new EvosMessageDelegate<SelectBannerRequest>(HandleSelectBannerRequest));
             RegisterHandler(new EvosMessageDelegate<SelectTitleRequest>(HandleSelectTitleRequest));
             RegisterHandler(new EvosMessageDelegate<UseOverconRequest>(HandleUseOverconRequest));
             RegisterHandler(new EvosMessageDelegate<UseGGPackRequest>(HandleUseGGPackRequest));
             RegisterHandler(new EvosMessageDelegate<UpdateUIStateRequest>(HandleUpdateUIStateRequest));
             RegisterHandler(new EvosMessageDelegate<GroupChatRequest>(HandleGroupChatRequest));
+            RegisterHandler(new EvosMessageDelegate<ClientFeedbackReport>(HandleClientFeedbackReport));
             RegisterHandler(new EvosMessageDelegate<RejoinGameRequest>(HandleRejoinGameRequest));
 
             /* TODO: adding these to
             RegisterHandler(new EvosMessageDelegate<PurchaseModResponse>(HandlePurchaseModRequest));
             RegisterHandler(new EvosMessageDelegate<PurchaseTauntRequest>(HandlePurchaseTauntRequest));
-            RegisterHandler(new EvosMessageDelegate<PurchaseBannerBackgroundRequest>(HandlePurchaseBannerRequest));
-            RegisterHandler(new EvosMessageDelegate<PurchaseBannerForegroundRequest>(HandlePurchaseEmblemRequest));
             RegisterHandler(new EvosMessageDelegate<PurchaseChatEmojiRequest>(HandlePurchaseChatEmoji));
             RegisterHandler(new EvosMessageDelegate<PurchaseLoadoutSlotRequest>(HandlePurchaseLoadoutSlot));
             */
 
+            RegisterHandler(new EvosMessageDelegate<PurchaseBannerForegroundRequest>(HandlePurchaseEmblemRequest));
+            RegisterHandler(new EvosMessageDelegate<PurchaseBannerBackgroundRequest>(HandlePurchaseBannerRequest));
             RegisterHandler(new EvosMessageDelegate<PurchaseAbilityVfxRequest>(HandlePurchasAbilityVfx));
             
         }
@@ -190,6 +196,48 @@ namespace CentralServer.LobbyServer
             };
 
             Send(update);
+        }
+
+        private void HandleGroupPromoteRequest(GroupPromoteRequest message)
+        {
+            GroupInfo group = GroupManager.GetPlayerGroup(AccountId);
+            //Sadly message.AccountId returns 0 so look it up by name/handle
+            long? accountId = SessionManager.GetOnlinePlayerByHandle(message.Name);
+            if (accountId.HasValue)
+            {
+                group.SetLeader((long)accountId);
+                BroadcastRefreshGroup();
+                //If the new leader is accountId send success true else false tho we do not have any localization does nothing atm 
+                if (group.IsLeader((long)accountId))
+                {
+                    Send(new GroupPromoteResponse()
+                    {
+                        Success = true
+                    });
+                }
+                else 
+                {
+                    Send(new GroupPromoteResponse()
+                    {
+                        //To send more need LocalizedFailure to be added
+                        Success = false
+                    });
+                }
+            }
+            else
+            {
+                Send(new GroupPromoteResponse()
+                {
+                    //To send more need LocalizedFailure to be added
+                    Success = false
+                });
+            }
+        }
+
+        private void HandleGroupKickRequest(GroupKickRequest message)
+        {
+            LobbyPlayerGroupInfo info = GroupManager.GetGroupInfo(AccountId);
+            GroupManager.LeaveGroup(info.Members.Find(m => m.MemberDisplayName == message.MemberName).AccountID, false);
         }
 
         public void HandleRegisterGame(RegisterGameClientRequest request)
@@ -619,6 +667,19 @@ namespace CentralServer.LobbyServer
             }
             
             GroupInfo group = GroupManager.GetPlayerGroup(AccountId);
+
+            if (group.Members.Count == LobbyConfiguration.GetMaxGroupSize())
+            {
+                log.Warn($"{AccountId} try'd to invite {request.FriendHandle} into a full group");
+                Send(new GroupInviteResponse
+                {
+                    FriendHandle = request.FriendHandle,
+                    ResponseId = request.RequestId,
+                    Success = false
+                });
+                return;
+            }
+
             GroupConfirmationRequest.JoinType joinType;
             if (group == null)
             {
@@ -637,36 +698,55 @@ namespace CentralServer.LobbyServer
             PersistedAccountData requester = DB.Get().AccountDao.GetAccount(AccountId);
             PersistedAccountData leader = DB.Get().AccountDao.GetAccount(group.Leader);
             LobbyServerProtocol friend = SessionManager.GetClientConnection((long) friendAccountId);
-            friend.Send(new GroupConfirmationRequest
+            if (group.Leader == AccountId)
             {
-                GroupId = group.GroupId,
-                LeaderName = leader.Handle,
-                LeaderFullHandle = leader.Handle,
-                JoinerName = requester.Handle,
-                JoinerAccountId = AccountId,
-                ConfirmationNumber = GroupManager.CreateGroupRequest(AccountId, friend.AccountId, group.GroupId),
-                ExpirationTime = TimeSpan.FromSeconds(20),
-                Type = joinType,
-                // RequestId = TODO
-            });
-            if (EvosConfiguration.GetPingOnGroupRequest() && !friend.IsInGroup() && !friend.IsInGame())
-            {
-                friend.Send(new ChatNotification
+                friend.Send(new GroupConfirmationRequest
                 {
-                    SenderAccountId = AccountId,
-                    SenderHandle = requester.Handle,
-                    ConsoleMessageType = ConsoleMessageType.WhisperChat,
-                    Text = "[Group request]"
+                    GroupId = group.GroupId,
+                    LeaderName = leader.Handle,
+                    LeaderFullHandle = leader.Handle,
+                    JoinerName = requester.Handle,
+                    JoinerAccountId = AccountId,
+                    ConfirmationNumber = GroupManager.CreateGroupRequest(AccountId, friend.AccountId, group.GroupId),
+                    ExpirationTime = TimeSpan.FromSeconds(20),
+                    Type = joinType,
+                    // RequestId = TODO
+                });
+                if (EvosConfiguration.GetPingOnGroupRequest() && !friend.IsInGroup() && !friend.IsInGame())
+                {
+                    friend.Send(new ChatNotification
+                    {
+                        SenderAccountId = AccountId,
+                        SenderHandle = requester.Handle,
+                        ConsoleMessageType = ConsoleMessageType.WhisperChat,
+                        Text = "[Group request]"
+                    });
+                }
+            
+                log.Info($"{AccountId}/{requester.Handle} invited {friend.AccountId}/{request.FriendHandle} to group {group.GroupId}");
+                Send(new GroupInviteResponse
+                {
+                    FriendHandle = request.FriendHandle,
+                    ResponseId = request.RequestId,
+                    Success = true
+                });
+            } 
+            else
+            {
+                LobbyServerProtocol leaderSession = SessionManager.GetClientConnection(leader.AccountId);
+                leaderSession.Send(new GroupSuggestionRequest
+                {
+                    LeaderAccountId = group.Leader,
+                    SuggestedAccountFullHandle = request.FriendHandle,
+                    SuggesterAccountName = requester.Handle,
+                    SuggesterAccountId = AccountId,
                 });
             }
-            
-            log.Info($"{AccountId}/{requester.Handle} invited {friend.AccountId}/{request.FriendHandle} to group {group.GroupId}");
-            Send(new GroupInviteResponse
-            {
-                FriendHandle = request.FriendHandle,
-                ResponseId = request.RequestId,
-                Success = true
-            });
+        }
+
+        public void HandleGroupSuggestionResponse(GroupSuggestionResponse response)
+        { 
+            //Is this needed? 
         }
 
         public void HandleGroupConfirmationResponse(GroupConfirmationResponse response)
@@ -703,7 +783,7 @@ namespace CentralServer.LobbyServer
             PersistedAccountData account = DB.Get().AccountDao.GetAccount(AccountId);
 
             //  Modify the correct type of banner
-            if(InventoryManager.BannerIsForeground(request.BannerID))
+            if (InventoryManager.BannerIsForeground(request.BannerID))
             {
                 account.AccountComponent.SelectedForegroundBannerID = request.BannerID;
             }
@@ -731,7 +811,7 @@ namespace CentralServer.LobbyServer
         {
             PersistedAccountData account = DB.Get().AccountDao.GetAccount(AccountId);
 
-            if (account.AccountComponent.UnlockedTitleIDs.Contains(request.TitleID))
+            if (account.AccountComponent.UnlockedTitleIDs.Contains(request.TitleID) || request.TitleID == -1)
             {
                 account.AccountComponent.SelectedTitleID = request.TitleID;
                 DB.Get().AccountDao.UpdateAccount(account);
@@ -816,6 +896,103 @@ namespace CentralServer.LobbyServer
             DB.Get().AccountDao.UpdateAccount(account);
         }
 
+        private void HandlePurchaseEmblemRequest(PurchaseBannerForegroundRequest request)
+        {
+            //Get the users account
+            PersistedAccountData account = DB.Get().AccountDao.GetAccount(AccountId);
+
+            // Never trust the client double check plus we need this info to deduct it from account
+            int cost = InventoryManager.GetBannerCost(request.BannerForegroundId);
+
+            log.Info($"Player {AccountId} trying to purchase emblem {request.BannerForegroundId} with {request.CurrencyType} for the price {cost}");
+
+            if (account.BankComponent.CurrentAmounts.GetCurrentAmount(request.CurrencyType) < cost)
+            {
+                PurchaseBannerForegroundResponse failedResponse = new PurchaseBannerForegroundResponse()
+                {
+                    ResponseId = request.RequestId,
+                    Result = PurchaseResult.Failed,
+                    CurrencyType = request.CurrencyType,
+                    BannerForegroundId = request.BannerForegroundId
+                };
+
+                Send(failedResponse);
+
+                return;
+            }
+
+            account.AccountComponent.UnlockedBannerIDs.Add(request.BannerForegroundId);
+
+            account.BankComponent.ChangeValue(request.CurrencyType, -cost, $"Purchase emblem");
+
+            DB.Get().AccountDao.UpdateAccount(account);
+
+            PurchaseBannerForegroundResponse response = new PurchaseBannerForegroundResponse()
+            {
+                ResponseId = request.RequestId,
+                Result = PurchaseResult.Success,
+                CurrencyType = request.CurrencyType,
+                BannerForegroundId = request.BannerForegroundId
+            };
+
+            Send(response);
+
+            //Update account curency
+            Send(new PlayerAccountDataUpdateNotification()
+            {
+                AccountData = account,
+            });
+
+        }
+
+        private void HandlePurchaseBannerRequest(PurchaseBannerBackgroundRequest request)
+        {
+            //Get the users account
+            PersistedAccountData account = DB.Get().AccountDao.GetAccount(AccountId);
+
+            // Never trust the client double check plus we need this info to deduct it from account
+            int cost = InventoryManager.GetBannerCost(request.BannerBackgroundId);
+
+            log.Info($"Player {AccountId} trying to purchase banner {request.BannerBackgroundId} with {request.CurrencyType} for the price {cost}");
+
+            if (account.BankComponent.CurrentAmounts.GetCurrentAmount(request.CurrencyType) < cost)
+            {
+                PurchaseBannerBackgroundResponse failedResponse = new PurchaseBannerBackgroundResponse()
+                {
+                    ResponseId = request.RequestId,
+                    Result = PurchaseResult.Failed,
+                    CurrencyType = request.CurrencyType,
+                    BannerBackgroundId = request.BannerBackgroundId
+                };
+
+                Send(failedResponse);
+
+                return;
+            }
+
+            account.AccountComponent.UnlockedBannerIDs.Add(request.BannerBackgroundId);
+
+            account.BankComponent.ChangeValue(request.CurrencyType, -cost, $"Purchase banner");
+
+            DB.Get().AccountDao.UpdateAccount(account);
+
+            PurchaseBannerBackgroundResponse response = new PurchaseBannerBackgroundResponse()
+            {
+                ResponseId = request.RequestId,
+                Result = PurchaseResult.Success,
+                CurrencyType = request.CurrencyType,
+                BannerBackgroundId = request.BannerBackgroundId
+            };
+
+            Send(response);
+
+            //Update account curency
+            Send(new PlayerAccountDataUpdateNotification()
+            {
+                AccountData = account,
+            });
+        }
+
         private void HandlePurchasAbilityVfx(PurchaseAbilityVfxRequest request)
         {
             //Get the users account
@@ -866,13 +1043,6 @@ namespace CentralServer.LobbyServer
             };
 
             Send(response);
-
-            // Notify in chat
-            Send(new ChatNotification
-            {
-                ConsoleMessageType = ConsoleMessageType.SystemMessage,
-                Text = "Purchase vfx succesfull."
-            });
 
             // Update character
             Send(new PlayerCharacterDataUpdateNotification()
@@ -948,6 +1118,35 @@ namespace CentralServer.LobbyServer
         public void CloseConnection()
         {
             this.WebSocket.Close();
+        }
+
+        private void HandleClientFeedbackReport(ClientFeedbackReport message)
+        {
+            if (LobbyConfiguration.GetAdminChannelWebhook().MaybeUri())
+            {
+                try
+                {
+                    DiscordWebhookClient discord = new DiscordWebhookClient(LobbyConfiguration.GetAdminChannelWebhook());
+                    LobbyServerPlayerInfo playerInfo = SessionManager.GetPlayerInfo(this.AccountId);
+                    EmbedBuilder eb = new EmbedBuilder()
+                    {
+                        Title = $"User Report From: {playerInfo.Handle}",
+                        Description = message.Message,
+                        Color = 16711680
+                    };
+                    eb.AddField("Reason", message.Reason, true);
+                    if (message.ReportedPlayerHandle != null)
+                    {
+                        eb.AddField("Reported Account", message.ReportedPlayerHandle, true);
+                    }
+                    Embed[] embedArray = new Embed[] { eb.Build() };
+                    discord.SendMessageAsync(null, false, embeds: embedArray, "Atlas Reactor");
+                }
+                catch (Exception e)
+                {
+                    log.Info($"Failed to send report to discord webhook {e.Message}");
+                }
+            }
         }
     }
 }

@@ -34,6 +34,17 @@ namespace CentralServer.LobbyServer.Group
             return accountId == Leader;
         }
 
+        public void SetLeader(long accountId)
+        {
+            lock (GroupManager.Lock)
+            {
+                if (Members.Contains(accountId))
+                {
+                    Leader = accountId;
+                }
+            }
+        }
+
         public void AddPlayer(long accountId)
         {
             if (Members.Contains(accountId))
