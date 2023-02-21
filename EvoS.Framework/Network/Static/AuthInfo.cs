@@ -15,10 +15,15 @@ namespace EvoS.Framework.Network.Static
         public string Handle { get; set; }
         public string Password { internal get; set; }  // internal so that it is not serialized
         public long SteamId { get; set; }
-        public string TicketData { get; set; }
+        public string TicketData { internal get; set; }
         public AuthType Type { get; set; }
         public string UserName { get; set; }
 
         [JsonIgnore] public string _Password => Password;
+
+        public string GetTicket()
+        {
+            return TicketData;
+        }
     }
 }

@@ -73,7 +73,7 @@ namespace EvoS.DirectoryServer
         private static AssignGameClientResponse ProcessRequest(AssignGameClientRequest request)
         {
             // If we received a valid TicketData, it means we were previously logged on (reconnection)
-            SessionTicketData ticketData = SessionTicketData.FromString(request.AuthInfo.TicketData);
+            SessionTicketData ticketData = SessionTicketData.FromString(request.AuthInfo.GetTicket());
             if (ticketData != null)
             {
                 request.SessionInfo.AccountId = ticketData.AccountID;
