@@ -31,7 +31,7 @@ namespace CentralServer.LobbyServer.Session
         public static SessionTicketData FromString(string data)
         {
             string[] parts = data.Split("\n");
-            if (parts.Length < 3) return null;
+            if (parts.Length != 4) return null;
 
             string signature = parts[0];
             SessionTicketData ticket = new SessionTicketData();
