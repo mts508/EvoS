@@ -6,8 +6,10 @@ using CentralServer.LobbyServer.Group;
 using EvoS.DirectoryServer.Account;
 using EvoS.Framework.Constants.Enums;
 using EvoS.Framework.DataAccess;
+using EvoS.Framework.Exceptions;
 using EvoS.Framework.Network.NetworkMessages;
 using EvoS.Framework.Network.Static;
+using log4net;
 
 namespace CentralServer.LobbyServer.Session
 {
@@ -17,19 +19,25 @@ namespace CentralServer.LobbyServer.Session
         private static ConcurrentDictionary<long, LobbyServerProtocol> ActiveConnections = new ConcurrentDictionary<long, LobbyServerProtocol>();
         private static ConcurrentDictionary<long, LobbySessionInfo> Sessions = new ConcurrentDictionary<long, LobbySessionInfo>();
 
+        private static readonly ILog log = LogManager.GetLogger(typeof(SessionManager));
+
         public static LobbyServerPlayerInfo OnPlayerConnect(LobbyServerProtocol client, RegisterGameClientRequest registerRequest)
         {
             if (registerRequest == null) return null;
 
             lock (Sessions)
             {
-                if (registerRequest.SessionInfo == null) return null;
-                if (registerRequest.SessionInfo.SessionToken == null || registerRequest.SessionInfo.SessionToken == 0) return null;
+                
+                if (registerRequest.SessionInfo == null) 
+                    throw new RegisterGameException("Session Info not received");
+                if (registerRequest.SessionInfo.SessionToken == null || registerRequest.SessionInfo.SessionToken == 0)
+                    throw new RegisterGameException("Session Info not received"); ;
                 
                 LobbySessionInfo sessionInfo = GetSessionInfo(registerRequest.SessionInfo.AccountId);
 
-                if (sessionInfo == null) return null; // Session not found
-                if (sessionInfo.SessionToken != registerRequest.SessionInfo.SessionToken) return null; // Session token do not match
+                if (sessionInfo == null) throw new RegisterGameException("Session not found. User not logged"); ; // Session not found
+
+                if (sessionInfo.SessionToken != registerRequest.SessionInfo.SessionToken) throw new RegisterGameException("This session is not valid anymore"); ; // Session token do not match
 
                 long accountId = sessionInfo.AccountId;
             
@@ -81,8 +89,8 @@ namespace CentralServer.LobbyServer.Session
             {
                 ActivePlayers.TryRemove(client.AccountId, out _);
                 LobbySessionInfo session = null;
-                Sessions.TryGetValue(client.AccountId, out _);
-
+                Sessions.TryGetValue(client.AccountId, out session);
+                
                 // Sometimes on reconnections we first have the new connection and then we receive the previous disconnection
                 // To avoid deleting the new connection, we check if the sessiontoken is the same
                 if (session != null && session.SessionToken == client.SessionToken)
