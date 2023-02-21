@@ -181,7 +181,8 @@ namespace EvoS.DirectoryServer
             }
 
             SessionManager.CleanSessionAfterReconnect(request.SessionInfo.AccountId);
-            
+            session = SessionManager.CreateSession(request.SessionInfo.AccountId);
+
 
             return new AssignGameClientResponse
             {
