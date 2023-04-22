@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CentralServer.LobbyServer.Session;
 using EvoS.Framework.Constants.Enums;
 using EvoS.Framework.DataAccess;
 using EvoS.Framework.Network.NetworkMessages;
 using EvoS.Framework.Network.Static;
+using static EvoS.Framework.Network.Static.SocialComponent;
 
 namespace CentralServer.LobbyServer.Friend
 {
@@ -28,6 +30,10 @@ namespace CentralServer.LobbyServer.Friend
                 Friends = SessionManager.GetOnlinePlayers()
                     .Where(id => id != accountId)
                     .Select(id => DB.Get().AccountDao.GetAccount(id))
+                    .Where(acc => {
+                        // If somebody blocked the other, they won't see each other in the friend list
+                        return !IsBlockedBy(acc.AccountId, accountId) && !IsBlockedBy(accountId, acc.AccountId);
+                    })
                     .ToDictionary(acc => acc.AccountId,
                         acc => new FriendInfo()
                         {
@@ -82,6 +88,26 @@ namespace CentralServer.LobbyServer.Friend
             };
 
             return response;
+        }
+
+        public static void BlockPlayer(LobbyServerProtocol client, long blockedAccountID)
+        {
+            PersistedAccountData account = DB.Get().AccountDao.GetAccount(client.AccountId);
+            account.SocialComponent.UpdateNote(blockedAccountID, "Blocked");
+            DB.Get().AccountDao.UpdateAccount(account);
+        }
+
+        public static bool IsBlockedBy(long otherId, long accountId)
+        {
+            PersistedAccountData accountData = DB.Get().AccountDao.GetAccount(accountId);
+
+            if (accountData.SocialComponent == null || accountData.SocialComponent.FriendInfo == null) return false;
+            FriendData friendData = null;
+            if (accountData.SocialComponent.FriendInfo.TryGetValue(otherId, out friendData))
+            {
+                return friendData.LastSeenNote == "Blocked";
+            }
+            return false;
         }
     }
 }

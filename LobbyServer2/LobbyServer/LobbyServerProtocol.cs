@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using CentralServer.BridgeServer;
 using CentralServer.LobbyServer.Character;
 using CentralServer.LobbyServer.Config;
@@ -84,6 +85,7 @@ namespace CentralServer.LobbyServer
             RegisterHandler(new EvosMessageDelegate<GroupChatRequest>(HandleGroupChatRequest));
             RegisterHandler(new EvosMessageDelegate<ClientFeedbackReport>(HandleClientFeedbackReport));
             RegisterHandler(new EvosMessageDelegate<RejoinGameRequest>(HandleRejoinGameRequest));
+            RegisterHandler(new EvosMessageDelegate<FriendUpdateRequest>(HandleFriendUpdateRequest));
 
             /* TODO: adding these to
             RegisterHandler(new EvosMessageDelegate<PurchaseModResponse>(HandlePurchaseModRequest));
@@ -691,7 +693,13 @@ namespace CentralServer.LobbyServer
             {
                 case ConsoleMessageType.GlobalChat:
                 {
-                    Broadcast(message);
+                    foreach (long recipientId in SessionManager.GetOnlinePlayers()) 
+                    {
+                        if (!FriendManager.IsBlockedBy(AccountId, recipientId)) 
+                        {
+                            SessionManager.GetClientConnection(recipientId).Send(message);
+                        }
+                    }
                     break;
                 }
                 case ConsoleMessageType.WhisperChat:
@@ -700,7 +708,12 @@ namespace CentralServer.LobbyServer
                     if (accountId.HasValue)
                     {
                         message.RecipientHandle = notification.RecipientHandle;
-                        SessionManager.GetClientConnection((long)accountId)?.Send(message);
+                        // if recipient has sender blocked we do not send the message to the recipient
+                        if (!FriendManager.IsBlockedBy(AccountId, accountId.Value)) 
+                        {
+                            SessionManager.GetClientConnection((long)accountId)?.Send(message);
+                        }
+
                         Send(message);
                     }
                     else
@@ -718,7 +731,11 @@ namespace CentralServer.LobbyServer
                     }
                     foreach (long accountId in CurrentServer.GetPlayers())
                     {
-                        SessionManager.GetClientConnection(accountId)?.Send(message);
+                        // If i am not blocked by the other player, the other player will receive the message
+                        if (!FriendManager.IsBlockedBy(AccountId, accountId)) 
+                        {
+                            SessionManager.GetClientConnection(accountId)?.Send(message);
+                        }
                     }
                     break;
                 }
@@ -732,7 +749,10 @@ namespace CentralServer.LobbyServer
                     }
                     foreach (UpdateGroupMemberData member in group.Members)
                     {
-                        SessionManager.GetClientConnection(member.AccountID)?.Send(message);
+                        if (!FriendManager.IsBlockedBy(AccountId, member.AccountID))
+                        {
+                            SessionManager.GetClientConnection(member.AccountID)?.Send(message);
+                        }
                     }
                     break;
                 }
@@ -750,7 +770,10 @@ namespace CentralServer.LobbyServer
                     }
                     foreach (long teammateAccountId in CurrentServer.GetPlayers(lobbyServerPlayerInfo.TeamId))
                     {
-                        SessionManager.GetClientConnection(teammateAccountId)?.Send(message);
+                        if (!FriendManager.IsBlockedBy(AccountId, teammateAccountId))
+                        {
+                            SessionManager.GetClientConnection(teammateAccountId)?.Send(message);
+                        }
                     }
                     break;
                 }
@@ -1193,6 +1216,8 @@ namespace CentralServer.LobbyServer
 
             foreach (long accountID in GroupManager.GetPlayerGroup(AccountId).Members)
             {
+                if (FriendManager.IsBlockedBy(AccountId, accountID)) return;
+                
                 LobbyServerProtocol connection = SessionManager.GetClientConnection(accountID);
                 connection.Send(message);
             }
@@ -1290,6 +1315,47 @@ namespace CentralServer.LobbyServer
         private void HandleClientFeedbackReport(ClientFeedbackReport message)
         {
             DiscordManager.Get().SendPlayerFeedback(AccountId, message);
+        }
+
+        public void HandleFriendUpdateRequest(FriendUpdateRequest request)
+        {
+            PersistedAccountData friendAccount = null;
+            if (request.FriendAccountId != 0)
+            {
+                friendAccount = DB.Get().AccountDao.GetAccount(request.FriendAccountId);
+            }
+            else
+            {
+                long? friendAccountId = SessionManager.GetOnlinePlayerByHandle(request.FriendHandle);
+                if(friendAccountId.HasValue)
+                {
+                    friendAccount = DB.Get().AccountDao.GetAccount(friendAccountId.Value);
+                }
+            }
+
+            // If we couln't find the account, we send an error message
+            if (friendAccount == null)
+            {
+                Send(new FriendUpdateResponse() 
+                { 
+                    Success = false,
+                    ResponseId = request.RequestId,
+                    LocalizedFailure = new LocalizationPayload() { Term = "FailedFriendBlock", Context = "FriendList" } 
+                });
+                return;
+            }
+
+            if (request.FriendOperation == FriendOperation.Block) {
+                FriendManager.BlockPlayer(this, friendAccount.AccountId);
+            }
+
+            Send(new FriendUpdateResponse() 
+            {
+                ResponseId = request.RequestId,
+                FriendOperation = request.FriendOperation,
+                FriendAccountId = friendAccount.AccountId,
+                FriendHandle = friendAccount.Handle
+            });
         }
     }
 }
