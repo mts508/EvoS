@@ -127,6 +127,26 @@ namespace EvoS.Framework.Network.Static
             };
             overrides.Add(CharacterType.Claymore, ClaymoreAbilityConfigOverride);
 
+            // Disable Grey's "Overcharged coils" mod
+            CharacterAbilityConfigOverride TrackerAbilityConfigOverride = new CharacterAbilityConfigOverride(CharacterType.Tracker);
+            TrackerAbilityConfigOverride.AbilityConfigs[4] = new AbilityConfigOverride(CharacterType.Tracker, 4)
+            {
+                AbilityModConfigs = new Dictionary<int, AbilityModConfigOverride>()
+                {
+                    {
+                        1,
+                        new AbilityModConfigOverride
+                        {
+                            AbilityIndex = 4,
+                            AbilityModIndex = 1,
+                            Allowed = false,
+                            CharacterType = CharacterType.Tracker
+                        }
+                    }
+                }
+            };
+            overrides.Add(CharacterType.Tracker, TrackerAbilityConfigOverride);
+
 
             return overrides;
         }
